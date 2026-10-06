@@ -187,6 +187,8 @@ table.t tr.click:hover td{background:var(--panel2)}
 .tourCard h4{margin:0 0 6px;font-size:15px}
 .tourCard p{margin:0 0 12px;color:var(--ink2);font-size:13px;line-height:1.55}
 .tourCard .row{justify-content:space-between}
+@media(max-width:760px){.appbar{position:relative;flex-wrap:wrap;gap:8px 10px;padding:10px 12px}.brand{min-width:0;flex:1 1 auto}.sub{display:none}.actions{order:2;flex:1 1 100%;gap:6px}.search-trigger{min-width:0;flex:1 1 auto}.search-trigger span{overflow:hidden;text-overflow:ellipsis}.search-trigger kbd{display:none}#crumbs{order:3;flex:1 1 100%;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;scrollbar-width:none}#crumbs::-webkit-scrollbar{display:none}.layout{grid-template-columns:minmax(0,1fr);padding:10px 10px 24px;gap:10px}.mapPane{height:66vh!important;min-height:430px}.metricBar{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.metricBar::-webkit-scrollbar{display:none}.tabs{top:0}.mapScope{max-width:70%;padding:6px 10px}.mapHint{right:12px;font-size:11px}.tip{max-width:min(320px,86vw)}.kpi{padding:10px}.kpi .v{font-size:18px}}
+@media(pointer:coarse){.mapStage{touch-action:pan-y}}
 .foot{color:var(--mut);font-size:11.5px;line-height:1.55;padding:6px 4px 0}
 .pill{display:inline-block;padding:1px 8px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);font-size:11.5px;color:var(--ink2)}
 .delta.up{color:var(--ok)}.delta.dn{color:var(--le)}
@@ -272,6 +274,7 @@ table.t tr.click:hover td{background:var(--panel2)}
 'use strict';
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
+const COARSE = window.matchMedia ? matchMedia('(pointer: coarse)').matches : false;
 const DATA = JSON.parse($('#appdata').textContent);
 const GEO = JSON.parse($('#geodata').textContent);
 const root = document.documentElement;
@@ -470,15 +473,20 @@ function munTip(m) { const b = m.b, M = METRICS[MAPMETRIC], f = pct(b.F, b.VVp),
   h += `Flávio <b style="color:var(--flavio)">${fmtP(f)}</b> · Lula <b style="color:var(--lula)">${fmtP(l)}</b> · 3ª via ${fmtP(tw)}<br>Governador: não-lulista ${fmtP(pct(b.GNL, b.VVgN))} · esquerda ${fmtP(pct(b.GLE, b.VVgN))}`;
   if (b.HN) h += `<br>Jair 2022: ${fmtP(pct(b.J22, b.VV22))} → Flávio ${fmtP(f)} <span class="delta ${f - pct(b.J22, b.VV22) >= 0 ? 'up' : 'dn'}">(${fmtPP(f - pct(b.J22, b.VV22))})</span>`;
   h += `<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--line)"><b>${M.label}: ${fmtMetric(M, M.get(b))}</b></div>`; return h; }
-stage.addEventListener('pointerdown', e => { if (e.button !== 0) return; drag = { x: e.clientX, y: e.clientY, tx: VIEW.tx, ty: VIEW.ty, moved: false }; stage.setPointerCapture(e.pointerId); });
+const PTRS = new Map(); let pinch = null;
+stage.addEventListener('pointerdown', e => { if (e.button !== 0) return; PTRS.set(e.pointerId, { x: e.clientX, y: e.clientY }); try { stage.setPointerCapture(e.pointerId); } catch (_) {} if (PTRS.size >= 2) { const [a, b] = [...PTRS.values()]; pinch = { d: Math.hypot(a.x - b.x, a.y - b.y) || 1 }; drag = null; hideTip(); return; } drag = { x: e.clientX, y: e.clientY, tx: VIEW.tx, ty: VIEW.ty, moved: false }; });
+stage.addEventListener('pointercancel', e => { PTRS.delete(e.pointerId); if (PTRS.size < 2) pinch = null; drag = null; stage.classList.remove('drag'); });
 stage.addEventListener('pointermove', e => {
+  if (PTRS.has(e.pointerId)) PTRS.set(e.pointerId, { x: e.clientX, y: e.clientY });
   const r = canvas.getBoundingClientRect(), X = e.clientX - r.left, Y = e.clientY - r.top;
+  if (pinch && PTRS.size >= 2) { const [a, b] = [...PTRS.values()]; const d = Math.hypot(a.x - b.x, a.y - b.y) || 1; cancelAnimationFrame(animId); zoomAt((a.x + b.x) / 2 - r.left, (a.y + b.y) / 2 - r.top, d / pinch.d, false); pinch.d = d; return; }
   if (drag) { const dx = e.clientX - drag.x, dy = e.clientY - drag.y; if (Math.abs(dx) + Math.abs(dy) > 4) { drag.moved = true; stage.classList.add('drag'); } if (drag.moved) { cancelAnimationFrame(animId); VIEW.tx = drag.tx + dx; VIEW.ty = drag.ty + dy; hideTip(); schedDraw(); return; } }
+  if (e.pointerType !== 'mouse') return;
   const f = featAtWorld((X - VIEW.tx) / VIEW.s, (Y - VIEW.ty) / VIEW.s);
   if (f !== HOVER) { HOVER = f; schedDraw(); }
   if (f && f.m) showTip(munTip(f.m), e.clientX, e.clientY); else hideTip();
 });
-stage.addEventListener('pointerup', e => { const r = canvas.getBoundingClientRect(); if (drag && !drag.moved) { const f = featAtWorld((e.clientX - r.left - VIEW.tx) / VIEW.s, (e.clientY - r.top - VIEW.ty) / VIEW.s); if (f && f.m) { if (e.shiftKey || e.altKey) { PIN = { type: 'mun', id: f.id }; toast('Fixado para comparar: ' + f.m.nm); renderAll(); drawMap(); } else if (SCOPE.type === 'br' || SCOPE.type === 'reg') setScope({ type: 'uf', uf: f.uf }); else setScope({ type: 'mun', id: f.id }); } } drag = null; stage.classList.remove('drag'); });
+stage.addEventListener('pointerup', e => { PTRS.delete(e.pointerId); if (pinch) { if (PTRS.size < 2) pinch = null; drag = null; stage.classList.remove('drag'); return; } const r = canvas.getBoundingClientRect(); if (drag && !drag.moved) { const f = featAtWorld((e.clientX - r.left - VIEW.tx) / VIEW.s, (e.clientY - r.top - VIEW.ty) / VIEW.s); if (f && f.m) { if (e.shiftKey || e.altKey) { PIN = { type: 'mun', id: f.id }; toast('Fixado para comparar: ' + f.m.nm); renderAll(); drawMap(); } else if (SCOPE.type === 'br' || SCOPE.type === 'reg') setScope({ type: 'uf', uf: f.uf }); else setScope({ type: 'mun', id: f.id }); } } drag = null; stage.classList.remove('drag'); });
 stage.addEventListener('pointerleave', () => { HOVER = null; hideTip(); schedDraw(); });
 stage.addEventListener('wheel', e => { e.preventDefault(); const r = canvas.getBoundingClientRect(); zoomAt(e.clientX - r.left, e.clientY - r.top, Math.exp(-e.deltaY * .0016), false); }, { passive: false });
 $('#zIn').onclick = () => zoomAt(MW / 2, MH / 2, 1.8, true);
@@ -492,8 +500,8 @@ function renderMetricBar() {
 function renderLegend() {
   const M = METRICS[MAPMETRIC], pal = palOf(M), b = M.breaks, u = M.unit === '%' ? '%' : '';
   const labs = pal.map((c, i) => { const lo = i === 0 ? null : b[i - 1], hi = i < b.length ? b[i] : null; return lo === null ? '< ' + hi + u : hi === null ? '≥ ' + lo + u : lo + '–' + hi + u; });
-  $('#legend').innerHTML = `<div class="ttl2"><span>${esc(M.long)}</span><span class="rstat">passe o mouse na escala para destacar</span></div><div class="legbar">${pal.map((c, i) => `<div data-i="${i}" style="background:${c}" title="${labs[i]}"></div>`).join('')}</div><div class="leglab">${labs.map(l => `<span>${l}</span>`).join('')}</div>`;
-  $$('#legend .legbar div').forEach(d => { d.onmouseenter = () => { LEGHL = +d.dataset.i; drawMap(); }; d.onmouseleave = () => { LEGHL = -1; drawMap(); }; });
+  $('#legend').innerHTML = `<div class="ttl2"><span>${esc(M.long)}</span><span class="rstat">${COARSE ? 'toque na escala para destacar' : 'passe o mouse na escala para destacar'}</span></div><div class="legbar">${pal.map((c, i) => `<div data-i="${i}" style="background:${c}" title="${labs[i]}"></div>`).join('')}</div><div class="leglab">${labs.map(l => `<span>${l}</span>`).join('')}</div>`;
+  $$('#legend .legbar div').forEach(d => { if (COARSE) { d.onclick = () => { const i = +d.dataset.i; LEGHL = LEGHL === i ? -1 : i; drawMap(); }; return; } d.onmouseenter = () => { LEGHL = +d.dataset.i; drawMap(); }; d.onmouseleave = () => { LEGHL = -1; drawMap(); }; });
 }
 
 /* ================= componentes ================= */
@@ -810,7 +818,7 @@ function renderCrumbs() {
   $('#crumbs').innerHTML = parts.join('') + (s.type === 'br' || s.type === 'reg' ? `<span class="sep" style="margin-left:6px">·</span>` + REGS.map(r => `<a data-go="reg:${r}" style="font-size:12px;${s.type === 'reg' && s.reg === r ? 'color:var(--acc)' : ''}">${r}</a>`).join('') : '');
   $$('#crumbs [data-go]').forEach(a => a.onclick = () => { const g = a.dataset.go; if (g === 'br') setScope({ type: 'br' }); else if (g.startsWith('reg:')) setScope({ type: 'reg', reg: g.slice(4) }); else setScope({ type: 'uf', uf: g.slice(3) }); });
   $('#mapScope').innerHTML = `<b>${esc(scopeName(s))}</b><br><span style="color:var(--mut)">${s.type === 'br' || s.type === 'reg' ? 'clique num estado para entrar' : 'clique num município para abrir'}</span>`;
-  $('#mapHint').textContent = 'role para zoom · arraste para mover · Shift+clique fixa para comparar';
+  $('#mapHint').textContent = COARSE ? 'toque para abrir · dois dedos para zoom · arraste para o lado para mover' : 'role para zoom · arraste para mover · Shift+clique fixa para comparar';
 }
 function renderAll() { const s = SCOPE, b = caseB(s), sc = scenScope(s); renderCrumbs(); renderHeader(s, b, sc); renderTabs(); renderTab(); }
 function updateHash() { const s = SCOPE; const h = (s.type === 'br' ? '' : s.type + '=' + encodeURIComponent(s.reg || s.uf || s.id)) + (TAB !== 'geral' ? (s.type === 'br' ? '' : '&') + 'tab=' + TAB : ''); try { history.replaceState(null, '', '#' + h); } catch (e) {} }
