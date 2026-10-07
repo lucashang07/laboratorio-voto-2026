@@ -2,7 +2,7 @@
 
 Mapa interativo do 1º turno das eleições de 2026: voto para presidente comparado ao voto para governador, Senado e Câmara, e comparação de Flávio Bolsonaro com Jair Bolsonaro (2018 e 2022), por estado, município e zona eleitoral.
 
-Acesse: https://lucashang07.github.io/laboratorio-voto-2026/
+Acesse: https://votocruzado.com.br/
 
 ## Fontes
 
