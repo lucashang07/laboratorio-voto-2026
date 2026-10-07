@@ -212,6 +212,27 @@ table.t tr.sel td{background:var(--panel2)}
   .rb{grid-template-columns:82px minmax(0,1fr) 56px}
   .hideM{display:none}
 }
+[data-theme=dark]{--j22:#67e8f9;--l22:#fdba74;--f1t:#c4b5fd;--l1t:#f9a8d4;--mix:#fde047;--g22:#cbd5e1;--g1t:#94a3b8}
+[data-theme=light]{--j22:#0891b2;--l22:#ea580c;--f1t:#7c3aed;--l1t:#db2777;--mix:#a16207;--g22:#334155;--g1t:#64748b}
+.legend{display:flex;flex-wrap:wrap;gap:2px 4px;font-size:11.5px;color:var(--mut);margin-top:8px;align-items:center}
+.lgi{display:inline-flex;align-items:center;gap:6px;border:1px solid transparent;background:transparent;border-radius:8px;padding:3px 7px;font-size:11.5px;color:var(--ink2);cursor:pointer;font-family:inherit}
+.lgi:hover{background:var(--panel2)}
+.lgi.on{border-color:var(--line2);background:var(--panel2);color:var(--ink);font-weight:650}
+.lgnote{padding:3px 7px}
+.smp{display:block;flex:0 0 auto;overflow:visible}
+.chart .se{transition:opacity .18s}
+.chart svg.hl .se{opacity:.1}
+.chart svg.hl .se.on{opacity:1}
+.chart .lab{font-size:11px;font-weight:750;paint-order:stroke;stroke:var(--panel);stroke-width:4px;stroke-linejoin:round}
+.chart .note2{font-size:10.5px;font-weight:700}
+.chart .mk{stroke:var(--mut);stroke-dasharray:2 3}
+.chart .mkt{fill:var(--mut);font-size:10px;font-weight:650;paint-order:stroke;stroke:var(--panel);stroke-width:3px}
+.chart .mk.live{stroke:var(--warn)}.chart .mkt.live{fill:var(--warn)}
+.ctip .r span:first-child{display:inline-flex;align-items:center;gap:6px}
+.chip.ref{background:transparent;color:var(--mut)}
+.chip.ref.on{background:var(--panel2);border-color:var(--ink2);color:var(--ink)}
+.chip .chk{display:inline-block;width:11px;text-align:center;font-weight:800}
+.rsw{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:7px}
 </style>
 </head>
 <body>
@@ -519,29 +540,71 @@ function remaining(s) { // estimativa de votos válidos ainda por apurar
 }
 
 // ---------- gráficos SVG ----------
+// Vocabulário visual fixo em todos os gráficos:
+//   ao vivo (2026)   = linha cheia e grossa, com contorno
+//   2º turno 2022    = traços longos
+//   1º turno 2026    = contas (bolinhas)
+//   mix de estados   = traço e ponto
+const STY = {
+  live: { w: 3.6, halo: true, cap: 'round' },
+  r22: { dash: '9 5', w: 2.2, cap: 'butt' },
+  r1t: { dash: '0.01 6.2', w: 3.6, cap: 'round' },
+  mix: { dash: '11 4 2 4', w: 2, cap: 'butt' },
+  reg: { w: 2, cap: 'round' },
+};
+const HL = {};
+let CHN = 0;
+function sample(se, w = 30) { return `<svg class="smp" width="${w}" height="12" viewBox="0 0 ${w} 12" aria-hidden="true"><line x1="3" x2="${w - 3}" y1="6" y2="6" stroke="${se.color}" stroke-width="${Math.min(se.w || 2, 3.6)}" ${se.dash ? `stroke-dasharray="${se.dash}"` : ''} stroke-linecap="${se.cap || 'round'}"/></svg>`; }
+function legend(el, key, hosts, items, extra) {
+  el.innerHTML = items.map(it => `<button class="lgi ${HL[key] === it.id ? 'on' : ''}" data-id="${it.id}" title="Destacar esta linha">${sample(it)}<span>${esc(it.name)}</span></button>`).join('') + (extra || '');
+  const apply = id => hosts.forEach(h => h && h._chart && h._chart.highlight(id));
+  $$('.lgi', el).forEach(b => {
+    b.onmouseenter = () => { if (!HL[key]) apply(b.dataset.id); };
+    b.onmouseleave = () => { if (!HL[key]) apply(null); };
+    b.onclick = () => { HL[key] = HL[key] === b.dataset.id ? null : b.dataset.id; $$('.lgi', el).forEach(x => x.classList.toggle('on', x.dataset.id === HL[key])); apply(HL[key]); };
+  });
+}
 function lineChart(host, o) {
-  const W = Math.max(260, Math.round(host.clientWidth || 600)), H = o.h || 280;
-  const M = { l: o.ml ?? 46, r: o.mr ?? 64, t: 12, b: 26 };
+  const W = Math.max(260, Math.round(host.clientWidth || 600)), H = o.h || 280, narrow = W < 560;
+  const inRange = p => p[1] != null && isFinite(p[1]) && p[0] >= o.x0 - 1e-9 && p[0] <= o.x1 + 1e-9;
+  const labs = [];
+  for (const se of o.series) { if (!se.lab || (narrow && se.labWide)) continue; const pts = se.pts.filter(inRange); if (!pts.length) continue; const p = pts[pts.length - 1]; labs.push({ id: se.id, x: p[0], v: p[1], t: narrow && se.labShort ? se.labShort(p[1]) : se.lab(p[1]), c: se.color }); }
+  const maxCh = labs.length ? Math.max(...labs.map(l => l.t.length)) : 0;
+  const M = { l: o.ml ?? 46, r: Math.max(o.mr ?? 14, labs.length ? Math.min(160, maxCh * 6.4 + 14) : 0), t: 14, b: 26 };
   const X = v => M.l + (W - M.l - M.r) * (v - o.x0) / ((o.x1 - o.x0) || 1), Y = v => M.t + (H - M.t - M.b) * (1 - (v - o.y0) / ((o.y1 - o.y0) || 1));
+  const uid = 'c' + (++CHN), BG = o.bg || 'var(--panel)';
   let s = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${esc(o.aria || 'gráfico')}">`;
   for (const v of o.yt) s += `<line class="grid" x1="${M.l}" x2="${W - M.r}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}"/><text class="ax" x="${M.l - 6}" y="${(Y(v) + 3.5).toFixed(1)}" text-anchor="end">${o.yf(v)}</text>`;
   for (const v of o.xt) s += `<text class="ax" x="${X(v).toFixed(1)}" y="${H - 7}" text-anchor="middle">${o.xf(v)}</text>`;
-  for (const h of o.hl || []) s += `<line class="${h.cls || 'zero'}" x1="${M.l}" x2="${W - M.r}" y1="${Y(h.y).toFixed(1)}" y2="${Y(h.y).toFixed(1)}"/>${h.label ? `<text class="ax" x="${W - M.r + 4}" y="${(Y(h.y) + 3.5).toFixed(1)}">${h.label}</text>` : ''}`;
-  for (const mk of o.marks || []) if (mk.x >= o.x0 && mk.x <= o.x1) s += `<line class="mk" x1="${X(mk.x).toFixed(1)}" x2="${X(mk.x).toFixed(1)}" y1="${M.t}" y2="${H - M.b}"/><text class="mkt" x="${(X(mk.x) + 3).toFixed(1)}" y="${M.t + 9}">${esc(mk.t)}</text>`;
-  const labels = [];
+  for (const h of o.hl || []) s += `<line class="${h.cls || 'zero'}" x1="${M.l}" x2="${W - M.r}" y1="${Y(h.y).toFixed(1)}" y2="${Y(h.y).toFixed(1)}"/>${h.label ? `<text class="ax" x="${M.l + 4}" y="${(Y(h.y) - 4).toFixed(1)}">${h.label}</text>` : ''}`;
+  for (const n of o.notes || []) s += `<text class="note2" x="${M.l + 6}" y="${(n.top ? M.t + 12 : H - M.b - 6).toFixed(1)}" fill="${n.color}">${esc(n.t)}</text>`;
+  for (const mk of o.marks || []) if (mk.x >= o.x0 && mk.x <= o.x1) s += `<line class="mk ${mk.live ? 'live' : ''}" x1="${X(mk.x).toFixed(1)}" x2="${X(mk.x).toFixed(1)}" y1="${M.t}" y2="${H - M.b}"/><text class="mkt ${mk.live ? 'live' : ''}" x="${(X(mk.x) + 4).toFixed(1)}" y="${M.t + (mk.live ? 22 : 9)}">${esc(mk.t)}</text>`;
   for (const se of o.series) {
-    const pts = se.pts.filter(p => p[1] != null && isFinite(p[1]) && p[0] >= o.x0 - 1e-9 && p[0] <= o.x1 + 1e-9);
+    const pts = se.pts.filter(inRange);
     if (!pts.length) continue;
     const d = pts.map((p, i) => (i ? 'L' : 'M') + X(p[0]).toFixed(1) + ',' + Y(clamp(p[1], o.y0, o.y1)).toFixed(1)).join('');
-    s += `<path d="${d}" fill="none" stroke="${se.color}" stroke-width="${se.w || 2}" ${se.dash ? `stroke-dasharray="${se.dash}"` : ''} opacity="${se.op ?? 1}" stroke-linejoin="round" stroke-linecap="round"/>`;
-    if (se.dot) { const p = pts[pts.length - 1]; s += `<circle cx="${X(p[0]).toFixed(1)}" cy="${Y(clamp(p[1], o.y0, o.y1)).toFixed(1)}" r="4" fill="${se.color}" stroke="var(--panel)" stroke-width="2"/>`; }
-    if (se.label) { const p = pts[pts.length - 1]; labels.push({ x: X(p[0]) + 7, y: Y(clamp(p[1], o.y0, o.y1)) + 4, t: se.label(p[1]), c: se.color }); }
+    let g = `<g class="se" data-id="${se.id}">`;
+    if (se.area0 && pts.length > 1) {
+      const z = Y(clamp(0, o.y0, o.y1)).toFixed(1), ad = d + `L${X(pts[pts.length - 1][0]).toFixed(1)},${z}L${X(pts[0][0]).toFixed(1)},${z}Z`;
+      g += `<clipPath id="${uid}a"><rect x="0" y="0" width="${W}" height="${z}"/></clipPath><clipPath id="${uid}b"><rect x="0" y="${z}" width="${W}" height="${H}"/></clipPath><path d="${ad}" fill="${se.area0[0]}" opacity=".2" clip-path="url(#${uid}a)"/><path d="${ad}" fill="${se.area0[1]}" opacity=".2" clip-path="url(#${uid}b)"/>`;
+    }
+    if (se.halo) g += `<path d="${d}" fill="none" stroke="${BG}" stroke-width="${(se.w || 2) + 4.5}" stroke-linejoin="round" stroke-linecap="round"/>`;
+    g += `<path d="${d}" fill="none" stroke="${se.color}" stroke-width="${se.w || 2}" ${se.dash ? `stroke-dasharray="${se.dash}"` : ''} stroke-linecap="${se.cap || 'round'}" stroke-linejoin="round" opacity="${se.op ?? 1}"/>`;
+    if (se.dot) { const p = pts[pts.length - 1]; g += `<circle cx="${X(p[0]).toFixed(1)}" cy="${Y(clamp(p[1], o.y0, o.y1)).toFixed(1)}" r="5" fill="${se.color}" stroke="${BG}" stroke-width="2.5"/>`; }
+    s += g + '</g>';
   }
-  labels.sort((a, b) => a.y - b.y); for (let i = 1; i < labels.length; i++) if (labels[i].y - labels[i - 1].y < 13) labels[i].y = labels[i - 1].y + 13;
-  for (const l of labels) s += `<text class="lab" x="${Math.min(l.x, W - 2).toFixed(1)}" y="${l.y.toFixed(1)}" fill="${l.c}">${esc(l.t)}</text>`;
-  s += `<line class="xh" id="xh" x1="0" x2="0" y1="${M.t}" y2="${H - M.b}" visibility="hidden"/><g class="hdots"></g><rect x="${M.l}" y="${M.t}" width="${W - M.l - M.r}" height="${H - M.t - M.b}" fill="transparent" class="hit"/></svg><div class="ctip" hidden></div>`;
+  // rótulos no fim de cada linha, sem sobreposição
+  const L = labs.map(l => ({ ...l, px: X(l.x) + 8, py: Y(clamp(l.v, o.y0, o.y1)) + 4 })).sort((a, b) => a.py - b.py);
+  const gap = 13, top = M.t + 6, bot = H - M.b - 2;
+  for (let i = 0; i < L.length; i++) { if (i && L[i].py - L[i - 1].py < gap) L[i].py = L[i - 1].py + gap; }
+  if (L.length && L[L.length - 1].py > bot) { L[L.length - 1].py = bot; for (let i = L.length - 2; i >= 0; i--) if (L[i + 1].py - L[i].py < gap) L[i].py = L[i + 1].py - gap; }
+  for (const l of L) s += `<text class="lab se" data-id="${l.id}" x="${Math.min(l.px, W - 2).toFixed(1)}" y="${Math.max(top, l.py).toFixed(1)}" fill="${l.c}">${esc(l.t)}</text>`;
+  s += `<line class="xh" x1="0" x2="0" y1="${M.t}" y2="${H - M.b}" visibility="hidden"/><g class="hdots"></g><rect x="${M.l}" y="${M.t}" width="${Math.max(1, W - M.l - M.r)}" height="${H - M.t - M.b}" fill="transparent" class="hit"/></svg><div class="ctip" hidden></div>`;
   host.innerHTML = s;
-  if (!o.tip) return;
+  const api = { highlight(id) { const svg = $('svg', host); if (!svg) return; svg.classList.toggle('hl', !!id); $$('.se', svg).forEach(g => g.classList.toggle('on', g.dataset.id === id)); } };
+  host._chart = api;
+  if (o.hlKey && HL[o.hlKey]) api.highlight(HL[o.hlKey]);
+  if (!o.tip) return api;
   const svg = $('svg', host), xh = $('.xh', host), tip = $('.ctip', host), dots = $('.hdots', host);
   const move = ev => {
     const r = svg.getBoundingClientRect(), cx = (ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left;
@@ -549,7 +612,7 @@ function lineChart(host, o) {
     const xv = o.x0 + (sx - M.l) / (W - M.l - M.r) * (o.x1 - o.x0);
     xh.setAttribute('x1', sx); xh.setAttribute('x2', sx); xh.setAttribute('visibility', 'visible');
     let dh = '';
-    for (const se of o.series) { if (se.noTip) continue; const pts = se.pts.filter(p => p[1] != null); if (!pts.length || xv < pts[0][0] - 1e-9 || xv > pts[pts.length - 1][0] + 1e-9) continue; const yv = interp(pts, xv, 1); if (yv == null) continue; dh += `<circle cx="${sx.toFixed(1)}" cy="${Y(clamp(yv, o.y0, o.y1)).toFixed(1)}" r="3.5" fill="${se.color}" stroke="var(--panel)" stroke-width="1.5"/>`; }
+    for (const se of o.series) { if (se.noTip) continue; const pts = se.pts.filter(p => p[1] != null); if (!pts.length || xv < pts[0][0] - 1e-9 || xv > pts[pts.length - 1][0] + 1e-9) continue; const yv = interp(pts, xv, 1); if (yv == null) continue; dh += `<circle cx="${sx.toFixed(1)}" cy="${Y(clamp(yv, o.y0, o.y1)).toFixed(1)}" r="4" fill="${se.color}" stroke="var(--panel)" stroke-width="2"/>`; }
     dots.innerHTML = dh;
     tip.innerHTML = o.tip(xv); tip.hidden = false;
     const tw = tip.offsetWidth, hostW = host.clientWidth; let left = cx + 14; if (left + tw > hostW) left = cx - tw - 14; tip.style.left = Math.max(0, left) + 'px'; tip.style.top = '6px';
@@ -557,7 +620,11 @@ function lineChart(host, o) {
   const hide = () => { xh.setAttribute('visibility', 'hidden'); dots.innerHTML = ''; tip.hidden = true; };
   svg.addEventListener('mousemove', move); svg.addEventListener('mouseleave', hide);
   svg.addEventListener('touchstart', move, { passive: true }); svg.addEventListener('touchmove', move, { passive: true });
+  return api;
 }
+// linha do tooltip com a amostra do traço
+function trow(se, v, fmt) { return v == null || !isFinite(v) ? '' : `<div class="r"><span>${sample(se, 22)} ${esc(se.short || se.name)}</span><span>${fmt(v)}</span></div>`; }
+function tipFor(series, xv, fmt) { let t = ''; for (const se of series) { if (se.noTip) continue; const pts = se.pts.filter(p => p[1] != null); if (pts.length && xv >= pts[0][0] - 1e-9 && xv <= pts[pts.length - 1][0] + 1e-9) t += trow(se, interp(pts, xv, 1), fmt); } return t; }
 function niceDomain(vals, minSpan, pad) { const v = vals.filter(x => x != null && isFinite(x)); if (!v.length) return [40, 60]; let a = Math.min(...v), b = Math.max(...v); const span = Math.max(minSpan, b - a); const mid = (a + b) / 2; a = Math.min(a, mid - span / 2) - pad; b = Math.max(b, mid + span / 2) + pad; return [Math.floor(a), Math.ceil(b)]; }
 function ticks(a, b, n) { const raw = (b - a) / n, p = Math.pow(10, Math.floor(Math.log10(raw))), st = [1, 2, 2.5, 5, 10].map(m => m * p).find(m => m >= raw) || raw; const out = []; for (let v = Math.ceil(a / st) * st; v <= b + 1e-9; v += st) out.push(+v.toFixed(6)); return out; }
 
@@ -633,82 +700,100 @@ function renderCountdown() { if (S.mode !== 'live' || S.cur) return; const el = 
 
 function refChips() {
   const el = $('#refChips');
-  const items = [['r22', '2º turno 2022', 'd'], ['r26', '1º turno 2026', 'o'], ['mix', 'Mix de estados 2022', 'd']];
-  el.innerHTML = items.map(([k, l, c]) => `<button class="chip ${S.refs[k] ? 'on' : ''}" data-k="${k}"><i class="${c}"></i>${l}</button>`).join('');
+  const items = [
+    ['r22', '2º turno 2022', [{ color: 'var(--j22)', ...STY.r22 }, { color: 'var(--l22)', ...STY.r22 }]],
+    ['r26', '1º turno 2026', [{ color: 'var(--f1t)', ...STY.r1t }, { color: 'var(--l1t)', ...STY.r1t }]],
+    ['mix', 'Mix de estados 2022', [{ color: 'var(--mix)', ...STY.mix }]],
+  ];
+  el.innerHTML = items.map(([k, l, sm]) => `<button class="chip ref ${S.refs[k] ? 'on' : ''}" data-k="${k}" aria-pressed="${!!S.refs[k]}" title="Mostrar ou esconder"><span class="chk">${S.refs[k] ? '✓' : ''}</span>${sm.map(x => sample(x, 22)).join('')}${l}</button>`).join('');
   $$('.chip', el).forEach(b => b.onclick = () => { S.refs[b.dataset.k] = !S.refs[b.dataset.k]; refChips(); renderEvo(); renderDiff(); });
 }
 function liveSnaps() { const last = S.snaps[S.snaps.length - 1]; if (!last || pct(last.br.st, last.br.ts) < 2) return S.snaps; return S.snaps.filter(s => pct(s.br.st, s.br.ts) >= 0.5); }
 function liveSeries(k) { const T = S.xMode === 'time'; return liveSnaps().map(s => [T ? s.m : pct(s.br.st, s.br.ts), sh(s.br, k)]); }
 function refSeries(R, I, k) { const T = S.xMode === 'time'; if (T) return R.tshare.map((r, m) => [m, refAtTime(R, m, k)]).filter(p => refProgAt(R, p[0]) >= 1); return R.nat.filter(p => p[0] >= 1).map(p => [p[0], p[I[k]]]); }
 function xAxis() { const T = S.xMode === 'time'; if (!T) return { x0: 0, x1: 100, xt: [0, 20, 40, 60, 80, 100], xf: v => v + '%' }; const mx = Math.max(240, ...S.snaps.map(s => s.m || 0)); const x1 = Math.min(300, Math.ceil(mx / 30) * 30); return { x0: 0, x1, xt: ticks(0, x1, 5).filter(v => v % 30 === 0), xf: v => hhmm(v) }; }
+function evoNames() { const [A, B] = S.cands.length ? S.cands : [candMeta('22', null, 2026), candMeta('13', null, 2026)]; return { A, B, aN: A.k === '22' ? (S.year === 2022 ? 'Jair' : 'Flávio') : A.short, bN: B.short }; }
+const pick = (series, ids) => ids.map(id => series.find(s => s.id === id)).filter(Boolean);
 function renderEvo() {
-  const host = $('#chEvo'), [A, B] = S.cands.length ? S.cands : [candMeta('22', null, 2026), candMeta('13', null, 2026)], T = S.xMode === 'time';
-  const series = [], ax = xAxis();
-  if (S.refs.r22) { series.push({ id: 'j22', name: 'Jair, 2º turno 2022', color: 'var(--c22)', dash: '6 4', op: .55, w: 1.6, pts: refSeries(R22, R22I, '22') }); series.push({ id: 'l22', name: 'Lula, 2º turno 2022', color: 'var(--c13)', dash: '6 4', op: .55, w: 1.6, pts: refSeries(R22, R22I, '13') }); }
-  if (S.refs.r26) { series.push({ id: 'f26', name: 'Flávio, 1º turno 2026', color: 'var(--c22)', dash: '1.5 3.5', op: .7, w: 2, pts: refSeries(R26, R26I, '22') }); series.push({ id: 'l26', name: 'Lula, 1º turno 2026', color: 'var(--c13)', dash: '1.5 3.5', op: .7, w: 2, pts: refSeries(R26, R26I, '13') }); }
-  if (S.refs.mix && S.snaps.length) series.push({ id: 'mix', name: 'Jair 2022 no mesmo mix de estados', color: 'var(--warn)', dash: '4 3', op: .9, w: 1.6, pts: S.snaps.map(s => [T ? s.m : pct(s.br.st, s.br.ts), mix22(s)]) });
-  if (S.snaps.length) { series.push({ id: 'a', name: A.nm, color: A.color, w: 3, pts: liveSeries(A.k), dot: true, label: v => fmtP(v, 2) }); series.push({ id: 'b', name: B.nm, color: B.color, w: 3, pts: liveSeries(B.k), dot: true, label: v => fmtP(v, 2) }); }
+  const host = $('#chEvo'), { A, B, aN, bN } = evoNames(), T = S.xMode === 'time', ax = xAxis(), ens = S.mode === 'ensaio';
+  const sfx = ens ? ' (ensaio)' : ', 2º turno 2026', now = ens ? '' : ' agora';
+  const series = [];
+  if (S.refs.r22) series.push(
+    { id: 'j22', name: 'Jair, 2º turno 2022', short: 'Jair 2022', color: 'var(--j22)', ...STY.r22, pts: refSeries(R22, R22I, '22'), lab: v => 'Jair 2022 ' + dec(v, 1), labWide: true },
+    { id: 'l22', name: 'Lula, 2º turno 2022', short: 'Lula 2022', color: 'var(--l22)', ...STY.r22, pts: refSeries(R22, R22I, '13'), lab: v => 'Lula 2022 ' + dec(v, 1), labWide: true });
+  if (S.refs.r26) series.push(
+    { id: 'f1t', name: 'Flávio, 1º turno 2026', short: 'Flávio 1º turno', color: 'var(--f1t)', ...STY.r1t, pts: refSeries(R26, R26I, '22'), lab: v => 'Flávio 1ºT ' + dec(v, 1), labWide: true },
+    { id: 'l1t', name: 'Lula, 1º turno 2026', short: 'Lula 1º turno', color: 'var(--l1t)', ...STY.r1t, pts: refSeries(R26, R26I, '13'), lab: v => 'Lula 1ºT ' + dec(v, 1), labWide: true });
+  if (S.refs.mix && S.snaps.length) series.push({ id: 'mix', name: 'Jair 2022 com o mesmo mix de estados', short: 'Jair 2022 (mix)', color: 'var(--mix)', ...STY.mix, pts: liveSnaps().map(s => [T ? s.m : pct(s.br.st, s.br.ts), mix22(s)]), lab: v => 'mix ' + dec(v, 1), labWide: true });
+  if (S.snaps.length) series.push(
+    { id: 'a', name: A.nm + sfx, short: aN + now, color: A.color, ...STY.live, pts: liveSeries(A.k), dot: true, lab: v => aN + ' ' + fmtP(v, 2), labShort: v => fmtP(v, 1) },
+    { id: 'b', name: B.nm + sfx, short: bN + now, color: B.color, ...STY.live, pts: liveSeries(B.k), dot: true, lab: v => bN + ' ' + fmtP(v, 2), labShort: v => fmtP(v, 1) });
   const vals = series.flatMap(se => se.pts.filter(p => p[0] >= (T ? 3 : 2)).map(p => p[1]));
   const [y0, y1] = niceDomain(vals, 14, 1);
-  const marks = []; if (S.refs.r22) { const v = R22.viradas.filter(v => v.lead === 'L').slice(-1)[0]; if (v) marks.push({ x: T ? v.m : v.x, t: 'virada 2022' }); }
-  for (const e of S.events.filter(e => e.type === 'virada')) marks.push({ x: T ? e.m : e.x, t: 'virada' });
-  lineChart(host, { h: window.innerWidth < 760 ? 250 : 300, ...ax, y0, y1, yt: ticks(y0, y1, 5), yf: v => v + '%', hl: [{ y: 50, label: '50%' }], series, marks, aria: 'Evolução do percentual de votos válidos',
-    tip: xv => { const lab = T ? hhmm(xv) : fmtP(xv, 1) + ' apurado'; let t = `<div class="h">${lab}</div>`; const row = (n, v, c) => v == null ? '' : `<div class="r"><span style="color:${c}">${n}</span><span>${fmtP(v, 2)}</span></div>`;
-      if (S.snaps.length) { const pts = S.snaps.map(s => [T ? s.m : pct(s.br.st, s.br.ts), sh(s.br, A.k), sh(s.br, B.k)]); if (xv >= pts[0][0] - 1e-9 && xv <= pts[pts.length - 1][0] + 1e-9) { t += row(A.short + ' ' + (S.mode === 'ensaio' && S.ensKey === '2t2022' ? '2022' : '2026'), interp(pts, xv, 1), A.color) + row(B.short, interp(pts, xv, 2), B.color); } }
-      if (S.refs.r22) t += '<div class="sep"></div>' + row('Jair 2022', T ? refAtTime(R22, xv, '22') : refAt(R22, R22I, xv, '22'), 'var(--c22)') + row('Lula 2022', T ? refAtTime(R22, xv, '13') : refAt(R22, R22I, xv, '13'), 'var(--c13)');
-      if (S.refs.r26) t += '<div class="sep"></div>' + row('Flávio 1º turno', T ? refAtTime(R26, xv, '22') : refAt(R26, R26I, xv, '22'), 'var(--c22)') + row('Lula 1º turno', T ? refAtTime(R26, xv, '13') : refAt(R26, R26I, xv, '13'), 'var(--c13)');
-      if (T) t += `<div class="sep"></div><div class="r"><span>Apurado em 2022</span><span>${fmtP(refProgAt(R22, xv), 1)}</span></div>`;
-      return t; } });
-  const lg = []; if (S.snaps.length) lg.push(`<span><i style="border-color:${A.color};border-top-width:3px"></i>${esc(A.nm)}${S.mode === 'ensaio' ? ' (ensaio)' : ' 2026'}</span><span><i style="border-color:${B.color};border-top-width:3px"></i>${esc(B.nm)}</span>`);
-  if (S.refs.r22) lg.push(`<span><i style="border-color:var(--c22);border-top-style:dashed"></i>Jair / Lula, 2º turno 2022</span>`);
-  if (S.refs.r26) lg.push(`<span><i style="border-color:var(--c22);border-top-style:dotted;border-top-width:3px"></i>Flávio / Lula, 1º turno 2026</span>`);
-  if (S.refs.mix && S.snaps.length) lg.push(`<span><i style="border-color:var(--warn);border-top-style:dashed"></i>Jair 2022 com o mesmo mix de estados apurados</span>`);
-  $('#lgEvo').innerHTML = lg.join('') + (S.snaps.length ? '' : '<span>As linhas sólidas de 2026 aparecem aqui quando a apuração começar.</span>');
+  const marks = [];
+  if (S.refs.r22) { const v = R22.viradas.filter(v => v.lead === 'L').slice(-1)[0]; if (v) marks.push({ x: T ? v.m : v.x, t: 'virada 2022' }); }
+  for (const e of S.events.filter(e => e.type === 'virada')) marks.push({ x: T ? e.m : e.x, t: 'virada', live: true });
+  const order = pick(series, ['a', 'b', 'j22', 'l22', 'f1t', 'l1t', 'mix']);
+  lineChart(host, { h: window.innerWidth < 760 ? 270 : 320, ...ax, y0, y1, yt: ticks(y0, y1, 5), yf: v => v + '%', hl: [{ y: 50, label: '50%' }], series, marks, hlKey: 'evo', aria: 'Evolução do percentual de votos válidos',
+    tip: xv => `<div class="h">${T ? hhmm(xv) : fmtP(xv, 1) + ' apurado'}</div>` + tipFor(order, xv, v => fmtP(v, 2)) + (T ? `<div class="sep"></div><div class="r"><span>Apurado em 2022 nesta hora</span><span>${fmtP(refProgAt(R22, xv), 1)}</span></div>` : '') });
+  legend($('#lgEvo'), 'evo', [host], order, S.snaps.length ? '' : '<span class="lgnote">As linhas cheias de 2026 aparecem aqui quando a apuração começar.</span>');
 }
+const REGS_SHORT = { N: 'Norte', NE: 'Nordeste', CO: 'C.-Oeste', SE: 'Sudeste', S: 'Sul', EX: 'Exterior' };
 function renderProg() {
   const cur = S.cur, br = cur ? cur.br : null, pst = br ? pct(br.st, br.ts) : 0;
   $('#bigNat').innerHTML = `<b>${fmtP(pst)}</b><span>${br ? `${fmtN(br.st)} de ${fmtN(br.ts)} seções no Brasil · ${fmtP(pct(br.est, br.te), 1)} do eleitorado` : 'das seções no Brasil (aguardando dados)'}</span>`;
-  const [A, B] = S.cands.length ? S.cands : [candMeta('22', null, 2026), candMeta('13', null, 2026)];
-  $('#regBars').innerHTML = REGS.map(g => { const r = regAgg(cur, g), p = pct(r.st, r.ts) || 0, a = sh(r, A.k), b = sh(r, B.k); return `<div class="rb"><span class="n">${REGN[g]}</span><span class="trk"><span class="fill" style="width:${p}%;background:${REGC[g]}"></span></span><span class="v">${fmtP(p, 1)}</span>${a != null ? `<span class="sh" title="${esc(A.short)} ${fmtP(a, 1)} · ${esc(B.short)} ${fmtP(b, 1)}"><div style="width:${a}%;background:${A.color}"></div><div style="width:${Math.max(0, 100 - a - b)}%;background:var(--co)"></div><div style="width:${b}%;background:${B.color}"></div></span>` : ''}</div>`; }).join('');
-  // gráfico: % apurado por horário
+  const { A, B } = evoNames();
+  $('#regBars').innerHTML = REGS.map(g => { const r = regAgg(cur, g), p = pct(r.st, r.ts) || 0, a = sh(r, A.k), b = sh(r, B.k); return `<div class="rb"><span class="n"><i class="rsw" style="background:${REGC[g]}"></i>${REGN[g]}</span><span class="trk"><span class="fill" style="width:${p}%;background:${REGC[g]}"></span></span><span class="v">${fmtP(p, 1)}</span>${a != null ? `<span class="sh" title="${esc(A.short)} ${fmtP(a, 1)} · ${esc(B.short)} ${fmtP(b, 1)}"><div style="width:${a}%;background:${A.color}"></div><div style="width:${Math.max(0, 100 - a - b)}%;background:var(--co)"></div><div style="width:${b}%;background:${B.color}"></div></span>` : ''}</div>`; }).join('');
   const host = $('#chProg'); const mx = Math.max(180, ...S.snaps.map(s => s.m || 0)); const x1 = Math.min(300, Math.ceil((mx + 10) / 30) * 30);
-  const series = [{ name: 'Brasil 2022', color: 'var(--mut)', dash: '6 4', op: .8, w: 1.6, pts: R22.tmin.BR.map((v, m) => [m, v]) }, { name: 'Brasil, 1º turno 2026', color: 'var(--mut)', dash: '1.5 3.5', op: .9, w: 2, pts: R26.tmin.BR.map((v, m) => [m, v]) }];
-  if (S.snaps.length) { for (const g of REGS) series.push({ name: REGN[g], color: REGC[g], w: 1.6, op: .9, pts: S.snaps.map(s => [s.m, pct(regAgg(s, g).st, regAgg(s, g).ts)]) }); series.push({ name: 'Brasil', color: 'var(--ink)', w: 3, pts: S.snaps.map(s => [s.m, pct(s.br.st, s.br.ts)]), dot: true }); }
-  lineChart(host, { h: 220, x0: 0, x1, xt: ticks(0, x1, 5).filter(v => v % 30 === 0), xf: hhmm, y0: 0, y1: 100, yt: [0, 25, 50, 75, 100], yf: v => v + '%', mr: 14, series, aria: 'Percentual apurado por horário',
-    tip: xv => { let t = `<div class="h">${hhmm(xv)}</div>`; if (S.snaps.length) { const pts = S.snaps.map(s => [s.m, pct(s.br.st, s.br.ts)]); if (xv <= pts[pts.length - 1][0] + 1e-9 && xv >= pts[0][0] - 1e-9) t += `<div class="r"><span>Brasil agora</span><span>${fmtP(interp(pts, xv, 1), 1)}</span></div>`; } t += `<div class="r"><span>Brasil 2022</span><span>${fmtP(refProgAt(R22, xv), 1)}</span></div><div class="r"><span>Brasil, 1º turno 2026</span><span>${fmtP(refProgAt(R26, xv), 1)}</span></div>`; return t; } });
-  $('#lgProg').innerHTML = (S.snaps.length ? '<span><i style="border-color:var(--ink);border-top-width:3px"></i>Brasil</span>' + REGS.map(g => `<span><i style="border-color:${REGC[g]}"></i>${REGN[g]}</span>`).join('') : '') + '<span><i style="border-color:var(--mut);border-top-style:dashed"></i>Brasil, 2º turno 2022</span><span><i style="border-color:var(--mut);border-top-style:dotted;border-top-width:3px"></i>Brasil, 1º turno 2026</span>';
+  const series = [
+    { id: 'p22', name: 'Brasil, 2º turno 2022', short: 'Brasil 2022', color: 'var(--g22)', ...STY.r22, pts: R22.tmin.BR.map((v, m) => [m, v]), lab: () => '2022', labWide: true },
+    { id: 'p1t', name: 'Brasil, 1º turno 2026', short: 'Brasil 1º turno', color: 'var(--g1t)', ...STY.r1t, pts: R26.tmin.BR.map((v, m) => [m, v]), lab: () => '1º turno', labWide: true }];
+  if (S.snaps.length) {
+    for (const g of REGS) series.push({ id: 'r' + g, name: REGN[g], short: REGN[g], color: REGC[g], ...STY.reg, pts: S.snaps.map(s => { const r = regAgg(s, g); return [s.m, pct(r.st, r.ts)]; }), lab: () => REGS_SHORT[g], labWide: true });
+    series.push({ id: 'pBR', name: 'Brasil agora', short: 'Brasil agora', color: 'var(--ink)', ...STY.live, dot: true, pts: S.snaps.map(s => [s.m, pct(s.br.st, s.br.ts)]), lab: v => 'Brasil ' + fmtP(v, 0), labShort: v => fmtP(v, 0) });
+  }
+  const order = pick(series, ['pBR', ...REGS.map(g => 'r' + g), 'p22', 'p1t']);
+  lineChart(host, { h: 240, x0: 0, x1, xt: ticks(0, x1, 5).filter(v => v % 30 === 0), xf: hhmm, y0: 0, y1: 100, yt: [0, 25, 50, 75, 100], yf: v => v + '%', series, hlKey: 'prog', aria: 'Percentual apurado por horário',
+    tip: xv => `<div class="h">${hhmm(xv)}</div>` + tipFor(order, xv, v => fmtP(v, 1)) });
+  legend($('#lgProg'), 'prog', [host], order);
 }
 function renderDiff() {
-  const host = $('#chDiff'), T = S.xMode === 'time', [A, B] = S.cands.length ? S.cands : [candMeta('22', null, 2026), candMeta('13', null, 2026)], ax = xAxis();
+  const host = $('#chDiff'), T = S.xMode === 'time', { A, B, aN, bN } = evoNames(), ax = xAxis(), ens = S.mode === 'ensaio';
+  const fmtMi = v => (v >= 0 ? '+' : '−') + dec(Math.abs(v), 2) + ' mi';
   const series = [];
-  if (S.refs.r22) series.push({ name: 'Jair − Lula, 2022', color: 'var(--c22)', dash: '6 4', op: .6, w: 1.6, pts: T ? R22.tshare.map((r, m) => [m, r[2] / 1e6]).filter(p => refProgAt(R22, p[0]) > 0) : R22.nat.filter(p => p[0] >= 0.5).map(p => [p[0], p[4] / 1e6]) });
-  if (S.refs.r26) series.push({ name: 'Flávio − Lula, 1º turno 2026', color: 'var(--c22)', dash: '1.5 3.5', op: .75, w: 2, pts: T ? R26.tshare.map((r, m) => [m, r[3] / 1e6]).filter(p => refProgAt(R26, p[0]) > 0) : R26.nat.filter(p => p[0] >= 0.5).map(p => [p[0], p[5] / 1e6]) });
-  if (S.snaps.length) series.push({ name: A.short + ' − ' + B.short, color: 'var(--ink)', w: 3, dot: true, label: v => (v >= 0 ? '+' : '−') + dec(Math.abs(v), 2) + ' mi', pts: liveSnaps().map(s => [T ? s.m : pct(s.br.st, s.br.ts), ((s.br.c[A.k] || 0) - (s.br.c[B.k] || 0)) / 1e6]) });
+  if (S.refs.r22) series.push({ id: 'd22', name: 'Jair − Lula, 2º turno 2022', short: 'Jair − Lula 2022', color: 'var(--j22)', ...STY.r22, pts: T ? R22.tshare.map((r, m) => [m, r[2] / 1e6]).filter(p => refProgAt(R22, p[0]) > 0) : R22.nat.filter(p => p[0] >= 0.5).map(p => [p[0], p[4] / 1e6]), lab: v => '2022 ' + fmtMi(v), labWide: true });
+  if (S.refs.r26) series.push({ id: 'd1t', name: 'Flávio − Lula, 1º turno 2026', short: 'Flávio − Lula 1º turno', color: 'var(--f1t)', ...STY.r1t, pts: T ? R26.tshare.map((r, m) => [m, r[3] / 1e6]).filter(p => refProgAt(R26, p[0]) > 0) : R26.nat.filter(p => p[0] >= 0.5).map(p => [p[0], p[5] / 1e6]), lab: v => '1ºT ' + fmtMi(v), labWide: true });
+  if (S.snaps.length) series.push({ id: 'dlive', name: `${aN} − ${bN}${ens ? ' (ensaio)' : ', 2º turno 2026'}`, short: `${aN} − ${bN}${ens ? '' : ' agora'}`, color: 'var(--ink)', ...STY.live, dot: true, area0: [A.color, B.color], pts: liveSnaps().map(s => [T ? s.m : pct(s.br.st, s.br.ts), ((s.br.c[A.k] || 0) - (s.br.c[B.k] || 0)) / 1e6]), lab: fmtMi, labShort: fmtMi });
   const vals = series.flatMap(se => se.pts.map(p => p[1])).filter(v => v != null);
-  const m = Math.max(1, ...vals.map(Math.abs)); const y1 = Math.ceil(m * 1.1), y0 = -y1;
-  lineChart(host, { h: window.innerWidth < 760 ? 210 : 240, ...ax, y0, y1, yt: ticks(y0, y1, 6), yf: v => (v > 0 ? '+' : v < 0 ? '−' : '') + dec(Math.abs(v), Math.abs(v) < 1 && v !== 0 ? 1 : 0) + ' mi', hl: [{ y: 0 }], series, aria: 'Diferença em votos',
-    tip: xv => { const lab = T ? hhmm(xv) : fmtP(xv, 1) + ' apurado'; let t = `<div class="h">${lab}</div>`; const row = (n, v) => v == null ? '' : `<div class="r"><span>${n}</span><span>${v >= 0 ? '+' : '−'}${fmtBig(Math.abs(v * 1e6))}</span></div>`; for (const se of series) { const pts = se.pts.filter(p => p[1] != null); if (pts.length && xv >= pts[0][0] - 1e-9 && xv <= pts[pts.length - 1][0] + 1e-9) t += row(se.name, interp(pts, xv, 1)); } return t; } });
-  $('#diffLead').textContent = A.k === '22' ? `Vantagem em votos válidos ao longo da apuração. Acima do zero, o candidato do PL está à frente (${S.year === 2022 ? 'Jair' : 'Flávio; nas linhas de 2022, Jair'}); abaixo, Lula.` : `Vantagem em votos válidos ao longo da apuração. Acima do zero, ${A.short} está à frente; abaixo, ${B.short}.`;
-  $('#lgDiff').innerHTML = series.map(se => `<span><i style="border-color:${se.color};${se.dash ? `border-top-style:${se.dash.startsWith('1.5') ? 'dotted;border-top-width:3px' : 'dashed'}` : 'border-top-width:3px'}"></i>${esc(se.name)}</span>`).join('');
+  const m = Math.max(1, ...vals.map(Math.abs)); const y1 = Math.ceil(m * 1.12), y0 = -y1;
+  const order = pick(series, ['dlive', 'd22', 'd1t']);
+  lineChart(host, { h: window.innerWidth < 760 ? 220 : 250, ...ax, y0, y1, yt: ticks(y0, y1, 6), yf: v => (v > 0 ? '+' : v < 0 ? '−' : '') + dec(Math.abs(v), Math.abs(v) < 1 && v !== 0 ? 1 : 0) + ' mi', hl: [{ y: 0 }], notes: [{ top: true, t: `▲ ${aN} à frente`, color: A.color }, { top: false, t: `▼ ${bN} à frente`, color: B.color }], series, hlKey: 'diff', aria: 'Diferença em votos',
+    tip: xv => `<div class="h">${T ? hhmm(xv) : fmtP(xv, 1) + ' apurado'}</div>` + tipFor(order, xv, v => (v >= 0 ? '+' : '−') + fmtBig(Math.abs(v * 1e6))) });
+  $('#diffLead').textContent = A.k === '22' ? `Vantagem em votos válidos ao longo da apuração. Acima do zero (área azul), o candidato do PL está à frente${S.year === 2022 ? '' : ' (Flávio; nas linhas de 2022, Jair)'}; abaixo (área vermelha), Lula.` : `Vantagem em votos válidos ao longo da apuração. Acima do zero, ${A.short} está à frente; abaixo, ${B.short}.`;
+  legend($('#lgDiff'), 'diff', [host], order);
 }
 function renderSmalls() {
-  const [A, B] = S.cands.length ? S.cands : [candMeta('22', null, 2026), candMeta('13', null, 2026)];
+  const { A, aN } = evoNames(), ens = S.mode === 'ensaio';
   const el = $('#smalls');
-  if (!el.dataset.built) { el.innerHTML = REGS.map(g => `<div class="sm"><div class="h">${REGN[g]}<span id="smh-${g}"></span></div><div class="nums" id="smn-${g}"></div><div class="chart" id="sm-${g}"></div></div>`).join(''); el.dataset.built = 1; }
+  if (!el.dataset.built) { el.insertAdjacentHTML('beforebegin', '<div class="legend" id="lgSmalls" style="margin:0 0 10px"></div>'); el.innerHTML = REGS.map(g => `<div class="sm"><div class="h">${REGN[g]}<span id="smh-${g}"></span></div><div class="nums" id="smn-${g}"></div><div class="chart" id="sm-${g}"></div></div>`).join(''); el.dataset.built = 1; }
+  let items = [];
   for (const g of REGS) {
     const r = regAgg(S.cur, g), p = pct(r.st, r.ts), a = sh(r, A.k);
-    const f22 = R22.reg[g], f26 = R26.reg[g];
     const fin22 = regFinal(R22, g, 'J'), fin26 = regFinal(R26, g, 'F');
     $('#smh-' + g).textContent = p != null ? fmtP(p, 1) + ' apurado' : '';
-    $('#smn-' + g).innerHTML = `${a != null ? `<span>${esc(A.short)} agora <b style="color:${A.color}">${fmtP(a, 1)}</b></span>` : ''}<span>final 2022: Jair <b>${fmtP(fin22, 1)}</b></span><span>1º turno: Flávio <b>${fmtP(fin26, 1)}</b></span>`;
-    const series = [{ name: 'Jair 2022', color: 'var(--c22)', dash: '6 4', op: .55, w: 1.4, pts: f22.map(q => [q[0], q[2]]) }, { name: 'Flávio 1º turno', color: 'var(--c22)', dash: '1.5 3.5', op: .75, w: 1.8, pts: f26.map(q => [q[0], q[2]]) }];
-    if (S.snaps.length) series.push({ name: A.short, color: A.color, w: 2.6, dot: true, pts: S.snaps.map(s => { const x = regAgg(s, g); return [pct(x.st, x.ts), sh(x, A.k)]; }).filter(q => q[0] > 0) });
+    $('#smn-' + g).innerHTML = `${a != null ? `<span>${esc(aN)}${ens ? '' : ' agora'} <b style="color:${A.color}">${fmtP(a, 1)}</b></span>` : ''}<span>Jair 2022 <b style="color:var(--j22)">${fmtP(fin22, 1)}</b></span><span>Flávio 1º turno <b style="color:var(--f1t)">${fmtP(fin26, 1)}</b></span>`;
+    const series = [
+      { id: 'sj22', name: 'Jair, 2º turno 2022', short: 'Jair 2022', color: 'var(--j22)', ...STY.r22, w: 2, pts: R22.reg[g].map(q => [q[0], q[2]]) },
+      { id: 'sf1t', name: 'Flávio, 1º turno 2026', short: 'Flávio 1º turno', color: 'var(--f1t)', ...STY.r1t, w: 3.2, pts: R26.reg[g].map(q => [q[0], q[2]]) }];
+    if (S.snaps.length) series.push({ id: 'slive', name: `${aN}${ens ? ' (ensaio)' : ', 2º turno 2026'}`, short: aN + (ens ? '' : ' agora'), color: A.color, ...STY.live, w: 3, dot: true, pts: S.snaps.map(s => { const x = regAgg(s, g); return [pct(x.st, x.ts), sh(x, A.k)]; }).filter(q => q[0] > 0) });
+    items = pick(series, ['slive', 'sj22', 'sf1t']);
     const vals = series.flatMap(se => se.pts.filter(q => q[0] >= 5).map(q => q[1]));
     const [y0, y1] = niceDomain(vals, 12, 1);
-    lineChart($('#sm-' + g), { h: 150, x0: 0, x1: 100, xt: [0, 50, 100], xf: v => v + '%', y0, y1, yt: ticks(y0, y1, 3), yf: v => v + '%', ml: 34, mr: 8, hl: y0 < 50 && y1 > 50 ? [{ y: 50 }] : [], series, aria: 'Região ' + REGN[g],
-      tip: xv => { let t = `<div class="h">${REGN[g]} · ${fmtP(xv, 0)} apurado</div>`; for (const se of series) { const pts = se.pts.filter(q => q[1] != null); if (pts.length && xv >= pts[0][0] - 1e-9 && xv <= pts[pts.length - 1][0] + 1e-9) t += `<div class="r"><span>${esc(se.name)}</span><span>${fmtP(interp(pts, xv, 1), 1)}</span></div>`; } return t; } });
+    lineChart($('#sm-' + g), { h: 160, x0: 0, x1: 100, xt: [0, 50, 100], xf: v => v + '%', y0, y1, yt: ticks(y0, y1, 3), yf: v => v + '%', ml: 34, mr: 8, bg: 'var(--panel2)', hl: y0 < 50 && y1 > 50 ? [{ y: 50 }] : [], series, hlKey: 'sm', aria: 'Região ' + REGN[g],
+      tip: xv => `<div class="h">${REGN[g]} · ${fmtP(xv, 0)} apurado</div>` + tipFor(items, xv, v => fmtP(v, 1)) });
   }
-  $('#regLead').textContent = `Percentual de ${A.k === '22' ? (S.year === 2022 ? 'Jair' : 'Flávio') : A.short} nos votos válidos de cada região conforme avança a apuração dela, comparado com o Jair no 2º turno de 2022 (tracejado) e com o Flávio no 1º turno de 2026 (pontilhado), no mesmo ponto da apuração.`;
+  legend($('#lgSmalls'), 'sm', REGS.map(g => $('#sm-' + g)), items);
+  $('#regLead').textContent = `Percentual de ${aN} nos votos válidos de cada região conforme avança a apuração dela, comparado com o Jair no 2º turno de 2022 e com o Flávio no 1º turno de 2026, no mesmo ponto da apuração.`;
 }
 function regFinal(R, g, k) { let v = 0, t = 0; for (const u of UFS) if (REG[u] === g) { v += R.uf[u].c[k]; t += R.uf[u].vv; } return t ? 100 * v / t : null; }
 function ufColor(x, A, B) { if (!x || !x.vv) return null; const a = sh(x, A.k), b = sh(x, B.k), m = a - b, i = clamp(Math.abs(m) / 40, 0.12, 1); const base = m >= 0 ? [79, 143, 247] : [240, 96, 90]; const dark = document.documentElement.getAttribute('data-theme') !== 'light'; const bg = dark ? [31, 39, 55] : [229, 231, 235]; const c = base.map((v, j) => Math.round(bg[j] + (v - bg[j]) * (0.35 + 0.65 * i))); return `rgb(${c.join(',')})`; }
