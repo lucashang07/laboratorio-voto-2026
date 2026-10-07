@@ -1,0 +1,47 @@
+name: Coletor da apuração (TSE)
+
+on:
+  workflow_dispatch:
+    inputs:
+      eleicao:
+        description: 'Código da eleição no TSE (6258 = 2º turno presidencial de 2026; 6257 = 1º turno, para teste)'
+        default: '6258'
+        required: true
+      minutos:
+        description: 'Tempo máximo de coleta, em minutos'
+        default: '330'
+        required: true
+  schedule:
+    # 25/10, horário de Brasília: 16h30, 16h55 e 17h20 (reservas caso o GitHub atrase ou pule um disparo)
+    - cron: '30 19 25 10 *'
+    - cron: '55 19 25 10 *'
+    - cron: '20 20 25 10 *'
+
+concurrency:
+  group: coletor-apuracao
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  coletar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+      - name: Preparar o branch de dados
+        run: |
+          git config --global user.name "coletor-apuracao"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin dados
+          git worktree add -B dados ../dados origin/dados
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Coletar
+        env:
+          ELEICAO: ${{ github.event.inputs.eleicao || '6258' }}
+          MINUTOS: ${{ github.event.inputs.minutos || '330' }}
+          DADOS_DIR: ../dados
+        run: node coletor/coletor.mjs

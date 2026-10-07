@@ -193,6 +193,8 @@ table.t tr.click:hover td{background:var(--panel2)}
 .pill{display:inline-block;padding:1px 8px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);font-size:11.5px;color:var(--ink2)}
 .delta.up{color:var(--ok)}.delta.dn{color:var(--le)}
 .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:99;background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:10px;font-size:13px;box-shadow:var(--shadow);animation:fadeUp .25s var(--ease)}
+.btn.live{text-decoration:none;color:inherit;display:inline-flex;align-items:center;gap:7px;font-weight:650}.btn.live .ldot{width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.18)}
+@media(max-width:760px){.actions{flex-wrap:wrap}.actions .search-trigger{flex:1 1 0;min-width:0}.btn.live{order:5;flex:1 1 100%;justify-content:center}}
 </style>
 </head>
 <body>
@@ -202,6 +204,7 @@ table.t tr.click:hover td{background:var(--panel2)}
   <nav id="crumbs"></nav>
   <div class="actions">
     <button class="btn search-trigger" id="btnSearch"><span>Buscar município ou estado</span><kbd>⌘K</kbd></button>
+    <a class="btn live" id="btnLive" href="apuracao/" title="Apuração do 2º turno com dados do TSE a cada minuto"><span class="ldot"></span>Apuração ao vivo</a>
     <button class="btn" id="btnTour">Tour</button>
     <button class="btn" id="btnMethod">Método</button>
     <button class="btn icon" id="btnTheme" title="Alternar tema claro/escuro">◐</button>
