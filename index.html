@@ -195,6 +195,13 @@ table.t tr.click:hover td{background:var(--panel2)}
 .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:99;background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:10px;font-size:13px;box-shadow:var(--shadow);animation:fadeUp .25s var(--ease)}
 .btn.live{text-decoration:none;color:inherit;display:inline-flex;align-items:center;gap:7px;font-weight:650}.btn.live .ldot{width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.18)}
 @media(max-width:760px){.actions{flex-wrap:wrap}.actions .search-trigger{flex:1 1 0;min-width:0}.btn.live{order:5;flex:1 1 100%;justify-content:center}}
+@media(max-width:760px){.palFoot{display:none}select,.sel{font-size:16px}.sel{padding:8px 10px}.metricBar .chip{padding:7px 12px}#crumbs a{padding:8px 10px}.tab{padding:9px 12px}}
+.wfl{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:7px;counter-reset:wf}
+.wfl li{display:grid;grid-template-columns:18px 12px minmax(0,1fr) auto;gap:8px;align-items:center;font-size:12.5px;line-height:1.35;counter-increment:wf}
+.wfl li:before{content:counter(wf);font-weight:700;color:var(--mut);text-align:right}
+.wfl .wsw{width:12px;height:12px;border-radius:3px}
+.wfl b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.skcap{font-size:11.5px;color:var(--mut);margin:6px 0 0;line-height:1.45}
 </style>
 </head>
 <body>
@@ -233,13 +240,13 @@ table.t tr.click:hover td{background:var(--panel2)}
         <div class="card"><div class="row" style="justify-content:space-between"><div><h3>Trajetória: 2018, 2022 e 2026</h3><p class="lead" style="margin-bottom:6px">Candidato do campo bolsonarista (Jair em 2018 e 2022, Flávio em 2026) contra o candidato do PT (Haddad em 2018, Lula em 2022 e 2026).</p></div><div class="row"><div class="seg" id="segTurn"><button data-v="1" class="on">1º turno</button><button data-v="2">2º turno</button></div><div class="seg" id="segUnit"><button data-v="p" class="on">% válidos</button><button data-v="v">votos</button></div></div></div><div id="traj"></div><div class="legrow" id="trajLegend"></div></div>
         <div class="card"><h3>Lado a lado</h3><p class="lead">Cada barra é 100% de quem foi votar naquele ano, no 1º turno.</p><div id="yearBars"></div><div class="legrow" id="yearLegend"></div></div>
         <div class="card"><div class="row" style="justify-content:space-between"><div><h3>Onde Flávio foi melhor e pior que Jair (1º turno de 2022)</h3><p class="lead" id="jairRankLead"></p></div><select class="sel" id="jairRankMin"><option value="0">qualquer tamanho</option><option value="10000" selected>10 mil+ eleitores</option><option value="50000">50 mil+ eleitores</option><option value="200000">200 mil+ eleitores</option></select></div><div class="two"><div><div class="pill" style="margin-bottom:6px">Maiores ganhos</div><div id="jairUp"></div></div><div><div class="pill" style="margin-bottom:6px">Maiores perdas</div><div id="jairDn"></div></div></div></div>
-        <div class="card"><h3>Cada ponto é um município: Jair 2022 x Flávio 2026</h3><p class="lead">Acima da linha diagonal, Flávio teve mais que Jair. Tamanho do ponto = número de eleitores. Passe o mouse e clique para abrir.</p><div class="scatterWrap"><canvas id="scJair"></canvas></div><div class="rstat" id="scJairStat"></div></div>
+        <div class="card"><h3>Cada ponto é um município: Jair 2022 x Flávio 2026</h3><p class="lead">Acima da linha diagonal, Flávio teve mais que Jair. Tamanho do ponto = número de eleitores. Passe o mouse (ou toque) num ponto e clique para abrir.</p><div class="scatterWrap"><canvas id="scJair"></canvas></div><div class="rstat" id="scJairStat"></div></div>
       </div>
       <div class="panel" data-tab="conta">
         <div class="card"><h3>A conta exata da diferença</h3><p class="lead">Quantos votos os candidatos fora do campo de Lula tiveram para governador a mais que Flávio, e de onde vem essa diferença. Não tem estimativa: como as mesmas pessoas votam nos dois cargos, a conta fecha exatamente.</p><div id="waterfall"></div><p class="lead" id="waterfallNote" style="margin-top:8px"></p></div>
       </div>
       <div class="panel" data-tab="fluxos">
-        <div class="card"><h3>Para onde foram os votos (estimativa)</h3><p class="lead">Ninguém sabe o voto de cada eleitor. O diagrama mostra uma estimativa coerente com os totais oficiais. Mexa nas hipóteses: o fluxo "Lula → governador não-lulista" é o que sobra para fechar a conta. Passe o mouse nos blocos para destacar os fluxos.</p>
+        <div class="card"><h3>Para onde foram os votos (estimativa)</h3><p class="lead">Ninguém sabe o voto de cada eleitor. O diagrama mostra uma estimativa coerente com os totais oficiais. Mexa nas hipóteses: o fluxo "Lula → governador não-lulista" é o que sobra para fechar a conta. Passe o mouse (ou toque) nos blocos para destacar os fluxos.</p>
           <div class="presets" id="presets"></div>
           <div class="ctrls">
             <div class="ctrl"><label>Eleitores de Flávio que votaram em governador não-lulista: <span class="cv" id="vF"></span></label><input type="range" id="pF" min="80" max="100" step="1"></div>
@@ -477,12 +484,12 @@ function munTip(m) { const b = m.b, M = METRICS[MAPMETRIC], f = pct(b.F, b.VVp),
   if (b.HN) h += `<br>Jair 2022: ${fmtP(pct(b.J22, b.VV22))} → Flávio ${fmtP(f)} <span class="delta ${f - pct(b.J22, b.VV22) >= 0 ? 'up' : 'dn'}">(${fmtPP(f - pct(b.J22, b.VV22))})</span>`;
   h += `<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--line)"><b>${M.label}: ${fmtMetric(M, M.get(b))}</b></div>`; return h; }
 const PTRS = new Map(); let pinch = null;
-stage.addEventListener('pointerdown', e => { if (e.button !== 0) return; PTRS.set(e.pointerId, { x: e.clientX, y: e.clientY }); try { stage.setPointerCapture(e.pointerId); } catch (_) {} if (PTRS.size >= 2) { const [a, b] = [...PTRS.values()]; pinch = { d: Math.hypot(a.x - b.x, a.y - b.y) || 1 }; drag = null; hideTip(); return; } drag = { x: e.clientX, y: e.clientY, tx: VIEW.tx, ty: VIEW.ty, moved: false }; });
+stage.addEventListener('pointerdown', e => { if (e.button !== 0) return; PTRS.set(e.pointerId, { x: e.clientX, y: e.clientY }); try { stage.setPointerCapture(e.pointerId); } catch (_) {} if (PTRS.size >= 2) { const [a, b] = [...PTRS.values()]; pinch = { d: Math.hypot(a.x - b.x, a.y - b.y) || 1, mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2 }; drag = null; hideTip(); return; } drag = { x: e.clientX, y: e.clientY, tx: VIEW.tx, ty: VIEW.ty, moved: false }; });
 stage.addEventListener('pointercancel', e => { PTRS.delete(e.pointerId); if (PTRS.size < 2) pinch = null; drag = null; stage.classList.remove('drag'); });
 stage.addEventListener('pointermove', e => {
   if (PTRS.has(e.pointerId)) PTRS.set(e.pointerId, { x: e.clientX, y: e.clientY });
   const r = canvas.getBoundingClientRect(), X = e.clientX - r.left, Y = e.clientY - r.top;
-  if (pinch && PTRS.size >= 2) { const [a, b] = [...PTRS.values()]; const d = Math.hypot(a.x - b.x, a.y - b.y) || 1; cancelAnimationFrame(animId); zoomAt((a.x + b.x) / 2 - r.left, (a.y + b.y) / 2 - r.top, d / pinch.d, false); pinch.d = d; return; }
+  if (pinch && PTRS.size >= 2) { const [a, b] = [...PTRS.values()]; const d = Math.hypot(a.x - b.x, a.y - b.y) || 1, mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2; cancelAnimationFrame(animId); zoomAt(mx - r.left, my - r.top, d / pinch.d, false); VIEW.tx += mx - pinch.mx; VIEW.ty += my - pinch.my; pinch.d = d; pinch.mx = mx; pinch.my = my; schedDraw(); return; }
   if (drag) { const dx = e.clientX - drag.x, dy = e.clientY - drag.y; if (Math.abs(dx) + Math.abs(dy) > 4) { drag.moved = true; stage.classList.add('drag'); } if (drag.moved) { cancelAnimationFrame(animId); VIEW.tx = drag.tx + dx; VIEW.ty = drag.ty + dy; hideTip(); schedDraw(); return; } }
   if (e.pointerType !== 'mouse') return;
   const f = featAtWorld((X - VIEW.tx) / VIEW.s, (Y - VIEW.ty) / VIEW.s);
@@ -541,21 +548,29 @@ function waterfallSVG(b) {
   const steps = [{ label: 'Votos de Flávio', v: b.F, abs: 1, c: CC.flavio }, { label: 'Lula teve a mais que a esquerda para governador', v: b.L - b.GLE, c: '#f97316' }, { label: 'Votos nos outros candidatos a presidente', v: b.TW + b.O, c: CC.tw }, { label: 'Branco/nulo: presidente menos governador', v: b.BNp - b.BNg, c: '#94a3b8' }, { label: 'Eleitores em trânsito (só presidente)', v: b.Cg - b.Cp, c: '#64748b' }, { label: 'Votos dos não-lulistas para governador', v: b.GNL, abs: 1, c: CC.nl }];
   let cum = 0; const bars = steps.map(st => { if (st.abs) { cum = st.v; return { st, y0: 0, y1: st.v }; } const y0 = cum; cum += st.v; return { st, y0, y1: cum }; });
   let maxV = 0, minV = 0; bars.forEach(x => { maxV = Math.max(maxV, x.y0, x.y1); minV = Math.min(minV, x.y0, x.y1); }); maxV *= 1.12;
-  const W = 680, H = 320, top = 26, bottom = 80, n = bars.length, step = W / n, bw = step * .56, yS = v => top + (H - top - bottom) * (1 - (v - minV) / (maxV - minV));
+  const NR = isNarrow(), cmp = v => { const a = Math.abs(v), sg = v < 0 ? '−' : '+'; return (a >= 1e6 ? dec1(a / 1e6) + ' mi' : a >= 1e3 ? Math.round(a / 1e3) + ' mil' : fmtN(a)); };
+  const W = NR ? 360 : 680, H = NR ? 250 : 320, top = 26, bottom = NR ? 30 : 80, n = bars.length, step = W / n, bw = step * (NR ? .62 : .56), yS = v => top + (H - top - bottom) * (1 - (v - minV) / (maxV - minV));
   let s = `<svg class="wf" viewBox="0 0 ${W} ${H}" width="100%"><line x1="0" x2="${W}" y1="${yS(0)}" y2="${yS(0)}" stroke="${CC.line2}"/>`;
   bars.forEach((x, i) => { const cx = step * i + step / 2, y1 = yS(Math.max(x.y0, x.y1)), y2 = yS(Math.min(x.y0, x.y1)), h = Math.max(2, y2 - y1);
     s += `<rect class="bar" style="animation-delay:${i * 90}ms" x="${(cx - bw / 2).toFixed(1)}" y="${y1.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="5" fill="${x.st.c}" data-tip="<b>${esc(x.st.label)}</b><br>${x.st.abs ? fmtN(x.st.v) : (x.st.v >= 0 ? '+' : '−') + fmtN(Math.abs(x.st.v))} votos"/>`;
-    s += `<text class="strong" x="${cx.toFixed(1)}" y="${(y1 - 7).toFixed(1)}" font-size="12" text-anchor="middle">${esc(x.st.abs ? fmtBig(x.st.v) : fmtSigned(x.st.v))}</text>`;
+    s += `<text class="strong" x="${cx.toFixed(1)}" y="${(y1 - 7).toFixed(1)}" font-size="${NR ? 11 : 12}" text-anchor="middle">${esc(NR ? (x.st.abs ? '' : (x.st.v < 0 ? '−' : '+')) + cmp(x.st.v) : (x.st.abs ? fmtBig(x.st.v) : fmtSigned(x.st.v)))}</text>`;
     if (i < n - 1) { const nx = step * (i + 1) + step / 2; s += `<line x1="${(cx + bw / 2).toFixed(1)}" x2="${(nx - bw / 2).toFixed(1)}" y1="${yS(x.y1).toFixed(1)}" y2="${yS(x.y1).toFixed(1)}" stroke="${CC.mut}" stroke-dasharray="3,3"/>`; }
-    wrapLabel(x.st.label, 18).slice(0, 4).forEach((l, k) => { s += `<text x="${cx.toFixed(1)}" y="${H - bottom + 18 + k * 13}" font-size="10.5" text-anchor="middle">${esc(l)}</text>`; }); });
-  return s + '</svg>';
+    if (NR) s += `<text class="strong" x="${cx.toFixed(1)}" y="${H - bottom + 20}" font-size="12" text-anchor="middle">${i + 1}</text>`;
+    else wrapLabel(x.st.label, 18).slice(0, 4).forEach((l, k) => { s += `<text x="${cx.toFixed(1)}" y="${H - bottom + 18 + k * 13}" font-size="10.5" text-anchor="middle">${esc(l)}</text>`; }); });
+  s += '</svg>';
+  if (NR) s += `<ol class="wfl">${steps.map((st, i) => `<li><span class="wsw" style="background:${st.c}"></span><span>${esc(st.label)}</span><b>${esc(st.abs ? fmtBig(st.v) : fmtSigned(st.v))}</b></li>`).join('')}</ol>`;
+  return s;
 }
+function isNarrow() { return (window.innerWidth || 1000) < 560; }
+function dec1(v) { return v.toFixed(1).replace('.', ','); }
 function spreadLabels(ys, gap, lo, hi) { const o = ys.slice(); for (let i = 1; i < o.length; i++) if (o[i] < o[i - 1] + gap) o[i] = o[i - 1] + gap; if (o.length && o[o.length - 1] > hi) { o[o.length - 1] = hi; for (let j = o.length - 2; j >= 0; j--) if (o[j] > o[j + 1] - gap) o[j] = o[j + 1] - gap; } if (o.length && o[0] < lo) { const d = lo - o[0]; for (let i = 0; i < o.length; i++) o[i] += d; } return o; }
 function sankeySVG(sc) {
   const Ln = [{ k: 'F', label: 'Flávio', c: CC.flavio }, { k: 'TW', label: 'Terceira via', c: CC.tw }, { k: 'L', label: 'Lula', c: CC.lula }, { k: 'O', label: 'Outros', c: CC.outros }, { k: 'BN', label: 'Branco/nulo', c: CC.nulo }];
-  const Rn = [{ label: 'Governador não-lulista', c: CC.nl }, { label: 'Governador de esquerda', c: CC.le }, { label: 'Branco/nulo', c: CC.nulo }];
+  const NR = isNarrow();
+  const Rn = [{ label: NR ? 'Gov. não-lulista' : 'Governador não-lulista', c: CC.nl }, { label: NR ? 'Gov. esquerda' : 'Governador de esquerda', c: CC.le }, { label: 'Branco/nulo', c: CC.nulo }];
   const rowT = Ln.map(n => sc.flows[n.k].reduce((a, x) => a + x, 0)), tot = rowT.reduce((a, x) => a + x, 0), colT = [0, 1, 2].map(j => Ln.reduce((a, n) => a + sc.flows[n.k][j], 0));
-  const W = 680, H = 440, top = 12, bot = 40, gap = 12, nw = 14, xL = 150, xR = W - 196, scl = (H - top - bot - gap * (Ln.length - 1)) / tot;
+  const W = NR ? 360 : 680, H = NR ? 400 : 440, top = 12, bot = NR ? 14 : 40, gap = NR ? 10 : 12, nw = NR ? 10 : 14, xL = NR ? 84 : 150, xR = W - (NR ? 114 : 196), scl = (H - top - bot - gap * (Ln.length - 1)) / tot;
+  const fN = NR ? 11.5 : 12.5, fV = NR ? 10.5 : 11.5;
   let y = top; const LY = []; Ln.forEach((n, i) => { LY.push(y); y += rowT[i] * scl + gap; });
   let ry = top + ((H - top - bot) - (tot * scl + gap * (Rn.length - 1))) / 2; const RY = []; Rn.forEach((n, j) => { RY.push(ry); ry += colT[j] * scl + gap; });
   let s = `<svg class="sk" id="skSvg" viewBox="0 0 ${W} ${H}" width="100%">`; const rOff = RY.slice();
@@ -563,9 +578,11 @@ function sankeySVG(sc) {
     const d = `M${xL + nw},${y0.toFixed(2)} C${xm},${y0.toFixed(2)} ${xm},${y1.toFixed(2)} ${xR},${y1.toFixed(2)} L${xR},${(y1 + h).toFixed(2)} C${xm},${(y1 + h).toFixed(2)} ${xm},${(y0 + h).toFixed(2)} ${xL + nw},${(y0 + h).toFixed(2)} Z`;
     s += `<path class="lk s-${n.k} t-${j}" style="animation-delay:${(i * 3 + j) * 40}ms" d="${d}" fill="${n.c}" fill-opacity="${hl ? .82 : .24}" data-tip="<b>${esc(n.label)} → ${esc(Rn[j].label)}</b><br>${fmtN(v)} eleitores (estimativa)"/>`; off += h; rOff[j] += h; }); });
   const lys = spreadLabels(Ln.map((n, i) => LY[i] + rowT[i] * scl / 2), 30, top + 8, H - bot - 14), rys = spreadLabels(Rn.map((n, j) => RY[j] + colT[j] * scl / 2), 30, top + 8, H - bot - 14);
-  Ln.forEach((n, i) => { const h = rowT[i] * scl; s += `<rect class="nd" data-s="${n.k}" x="${xL}" y="${LY[i].toFixed(1)}" width="${nw}" height="${Math.max(1.5, h).toFixed(1)}" rx="3" fill="${n.c}"/><text class="strong" x="${xL - 8}" y="${(lys[i] - 1).toFixed(1)}" font-size="12.5" text-anchor="end">${esc(n.label)}</text><text class="muted" x="${xL - 8}" y="${(lys[i] + 13).toFixed(1)}" font-size="11.5" text-anchor="end">${fmtBig(rowT[i])}</text>`; });
-  Rn.forEach((n, j) => { const h = colT[j] * scl; s += `<rect class="nd" data-t="${j}" x="${xR}" y="${RY[j].toFixed(1)}" width="${nw}" height="${Math.max(1.5, h).toFixed(1)}" rx="3" fill="${n.c}"/><text class="strong" x="${xR + nw + 8}" y="${(rys[j] - 1).toFixed(1)}" font-size="12.5">${esc(n.label)}</text><text class="muted" x="${xR + nw + 8}" y="${(rys[j] + 13).toFixed(1)}" font-size="11.5">${fmtBig(colT[j])}</text>`; });
-  s += `<text class="muted" x="${W / 2}" y="${H - 8}" font-size="11" text-anchor="middle">Esquerda: voto para presidente. Direita: voto para governador. Faixas fortes: votos dos não-lulistas que não vieram de Flávio.</text>`;
+  Ln.forEach((n, i) => { const h = rowT[i] * scl; s += `<rect class="nd" data-s="${n.k}" x="${xL}" y="${LY[i].toFixed(1)}" width="${nw}" height="${Math.max(1.5, h).toFixed(1)}" rx="3" fill="${n.c}"/><text class="strong" x="${xL - 7}" y="${(lys[i] - 1).toFixed(1)}" font-size="${fN}" text-anchor="end">${esc(n.label)}</text><text class="muted" x="${xL - 7}" y="${(lys[i] + 13).toFixed(1)}" font-size="${fV}" text-anchor="end">${fmtBig(rowT[i])}</text>`; });
+  Rn.forEach((n, j) => { const h = colT[j] * scl; s += `<rect class="nd" data-t="${j}" x="${xR}" y="${RY[j].toFixed(1)}" width="${nw}" height="${Math.max(1.5, h).toFixed(1)}" rx="3" fill="${n.c}"/><text class="strong" x="${xR + nw + 7}" y="${(rys[j] - 1).toFixed(1)}" font-size="${fN}">${esc(n.label)}</text><text class="muted" x="${xR + nw + 7}" y="${(rys[j] + 13).toFixed(1)}" font-size="${fV}">${fmtBig(colT[j])}</text>`; });
+  const cap = 'Esquerda: voto para presidente. Direita: voto para governador. Faixas fortes: votos dos não-lulistas que não vieram de Flávio.';
+  if (NR) return s + `</svg><p class="skcap">${cap}</p>`;
+  s += `<text class="muted" x="${W / 2}" y="${H - 8}" font-size="11" text-anchor="middle">${cap}</text>`;
   return s + '</svg>';
 }
 function wireSankey() { const svg = $('#skSvg'); if (!svg) return; $$('.nd', svg).forEach(nd => { nd.onmouseenter = () => { svg.classList.add('dim'); const sel = nd.dataset.s ? '.s-' + nd.dataset.s : '.t-' + nd.dataset.t; $$(sel, svg).forEach(p => p.classList.add('on')); }; nd.onmouseleave = () => { svg.classList.remove('dim'); $$('.lk.on', svg).forEach(p => p.classList.remove('on')); }; }); }
@@ -585,7 +602,7 @@ function trajSVG(b) {
   const val = (x, vv) => P ? pct(x, vv) : x;
   const all = []; pts.forEach(p => { all.push(val(p.r, p.vv), val(p.p, p.vv)); if (TRAJ.turn === 1) all.push(val(p.o, p.vv)); });
   let lo = Math.min(...all), hi = Math.max(...all); const padv = (hi - lo) * .18 || 1; lo = Math.max(0, lo - padv); hi = hi + padv;
-  const W = 680, H = 290, l = 118, r = 78, t = 22, bt = 34, xs = i => l + (W - l - r) * i / 2, ys = v => t + (H - t - bt) * (1 - (v - lo) / (hi - lo));
+  const NR = isNarrow(), W = NR ? 360 : 680, H = NR ? 270 : 290, l = NR ? 80 : 118, r = NR ? 62 : 78, t = 22, bt = 34, xs = i => l + (W - l - r) * i / 2, ys = v => t + (H - t - bt) * (1 - (v - lo) / (hi - lo));
   let s = `<svg viewBox="0 0 ${W} ${H}" width="100%">`;
   for (let k = 0; k <= 4; k++) { const v = lo + (hi - lo) * k / 4; s += `<line x1="${l - 40}" x2="${W - r + 40}" y1="${ys(v)}" y2="${ys(v)}" stroke="${CC.line}"/><text class="muted" x="4" y="${ys(v) + 4}" font-size="10.5" text-anchor="start">${P ? fmtP(v, 0) : fmtShort(v)}</text>`; }
   pts.forEach((p, i) => { s += `<text class="strong" x="${xs(i)}" y="${H - 10}" font-size="12" text-anchor="middle">${p.y}${TRAJ.turn === 2 && i === 2 ? ' (1º t.)' : ''}</text>`; });
@@ -784,11 +801,11 @@ let UFSORT = { k: 'est', d: 'desc' };
 function renderCands(s) {
   const el = $('#candsBody'), b = caseB(s);
   if (s.type === 'uf' || s.type === 'mun') { const uf = scopeUF(s), U = DATA.ufs[uf], m = s.type === 'mun' ? byId[s.id] : null;
-    el.innerHTML = `<div class="card"><p class="lead">"Campo de Lula" = coligação oficial com o PT. "Esquerda" = partido de esquerda fora dessa coligação. "Não-lulista" = todos os demais (direita e centro). Passe o mouse no partido para ver a coligação.</p>${candTable('Governador', U.gov, m ? m.g : U.gov.map(c => c.v), b.VVgN, !!m)}${candTable('Senado (2 vagas)', U.sen, m ? m.s : U.sen.map(c => c.v), b.VVsN, !!m)}</div>` + congressHTML([uf], UFAGG[uf]); }
+    el.innerHTML = `<div class="card"><p class="lead">"Campo de Lula" = coligação oficial com o PT. "Esquerda" = partido de esquerda fora dessa coligação. "Não-lulista" = todos os demais (direita e centro). Passe o mouse (ou toque) no partido para ver a coligação.</p>${candTable('Governador', U.gov, m ? m.g : U.gov.map(c => c.v), b.VVgN, !!m)}${candTable('Senado (2 vagas)', U.sen, m ? m.s : U.sen.map(c => c.v), b.VVsN, !!m)}</div>` + congressHTML([uf], UFAGG[uf]); }
   else { const rows = ufsOf(s).map(u => { const bb = UFAGG[u], sc = scen(bb, PRM); return { u, nome: DATA.ufs[u].nome, F: pct(bb.F, bb.VVp), J: pct(bb.J22, bb.VV22), dJ: pct(bb.Fh, bb.VVph) - pct(bb.J22, bb.VV22), L: pct(bb.L, bb.VVp), TW: pct(bb.TW, bb.VVp), GNL: pct(bb.GNL, bb.VVgN), est: sc.LtoNL, lb: bb.lb0, st: DATA.ufs[u].stance }; });
     rows.sort((a, c) => { const x = a[UFSORT.k], y = c[UFSORT.k]; if (typeof x === 'string') return UFSORT.d === 'asc' ? x.localeCompare(y, 'pt') : y.localeCompare(x, 'pt'); return UFSORT.d === 'asc' ? x - y : y - x; });
     const th = (k, l, r) => `<th class="${r ? 'r' : ''}" data-k="${k}">${l}${UFSORT.k === k ? (UFSORT.d === 'desc' ? ' ↓' : ' ↑') : ''}</th>`;
-    el.innerHTML = `<div class="card"><h3>Estados</h3><p class="lead">Clique numa linha para abrir. Clique no título de uma coluna para ordenar.</p><div class="scroll"><table class="t" id="ufT"><tr>${th('nome', 'Estado')}${th('F', 'Flávio', 1)}${th('J', 'Jair 2022', 1)}${th('dJ', 'Δ Jair', 1)}${th('L', 'Lula', 1)}${th('TW', '3ª via', 1)}${th('GNL', 'Gov. não-lul.', 1)}${th('est', 'Lula → gov. não-lul.', 1)}${th('lb', 'Mínimo', 1)}${th('st', 'Governador')}</tr>${rows.map(r => `<tr class="click" data-uf="${r.u}"><td>${esc(r.nome)}</td><td class="r">${fmtP(r.F)}</td><td class="r">${fmtP(r.J)}</td><td class="r"><span class="delta ${r.dJ >= 0 ? 'up' : 'dn'}">${fmtPP(r.dJ)}</span></td><td class="r">${fmtP(r.L)}</td><td class="r">${fmtP(r.TW)}</td><td class="r">${fmtP(r.GNL)}</td><td class="r">${fmtShort(r.est)}</td><td class="r">${fmtShort(r.lb)}</td><td>${r.st === '2º turno' ? '2º turno' : r.st === 'neutro' ? 'neutro' : 'apoia ' + r.st}</td></tr>`).join('')}</table></div></div>` + congressHTML(ufsOf(s), b);
+    el.innerHTML = `<div class="card"><h3>Estados</h3><p class="lead">Toque ou clique numa linha para abrir; no título de uma coluna para ordenar.</p><div class="scroll"><table class="t" id="ufT"><tr>${th('nome', 'Estado')}${th('F', 'Flávio', 1)}${th('J', 'Jair 2022', 1)}${th('dJ', 'Δ Jair', 1)}${th('L', 'Lula', 1)}${th('TW', '3ª via', 1)}${th('GNL', 'Gov. não-lul.', 1)}${th('est', 'Lula → gov. não-lul.', 1)}${th('lb', 'Mínimo', 1)}${th('st', 'Governador')}</tr>${rows.map(r => `<tr class="click" data-uf="${r.u}"><td>${esc(r.nome)}</td><td class="r">${fmtP(r.F)}</td><td class="r">${fmtP(r.J)}</td><td class="r"><span class="delta ${r.dJ >= 0 ? 'up' : 'dn'}">${fmtPP(r.dJ)}</span></td><td class="r">${fmtP(r.L)}</td><td class="r">${fmtP(r.TW)}</td><td class="r">${fmtP(r.GNL)}</td><td class="r">${fmtShort(r.est)}</td><td class="r">${fmtShort(r.lb)}</td><td>${r.st === '2º turno' ? '2º turno' : r.st === 'neutro' ? 'neutro' : 'apoia ' + r.st}</td></tr>`).join('')}</table></div></div>` + congressHTML(ufsOf(s), b);
     $$('#ufT tr.click').forEach(tr => tr.onclick = () => setScope({ type: 'uf', uf: tr.dataset.uf }));
     $$('#ufT th').forEach(t => t.onclick = () => { const k = t.dataset.k; UFSORT = { k, d: UFSORT.k === k && UFSORT.d === 'desc' ? 'asc' : 'desc' }; renderCands(SCOPE); }); }
   requestAnimationFrame(() => requestAnimationFrame(() => $$('#candsBody .sbseg').forEach(d => d.style.width = d.dataset.w + '%')));
@@ -820,8 +837,8 @@ function renderCrumbs() {
   if (s.type === 'br') parts[0] = `<span class="cur">Brasil</span>`;
   $('#crumbs').innerHTML = parts.join('') + (s.type === 'br' || s.type === 'reg' ? `<span class="sep" style="margin-left:6px">·</span>` + REGS.map(r => `<a data-go="reg:${r}" style="font-size:12px;${s.type === 'reg' && s.reg === r ? 'color:var(--acc)' : ''}">${r}</a>`).join('') : '');
   $$('#crumbs [data-go]').forEach(a => a.onclick = () => { const g = a.dataset.go; if (g === 'br') setScope({ type: 'br' }); else if (g.startsWith('reg:')) setScope({ type: 'reg', reg: g.slice(4) }); else setScope({ type: 'uf', uf: g.slice(3) }); });
-  $('#mapScope').innerHTML = `<b>${esc(scopeName(s))}</b><br><span style="color:var(--mut)">${s.type === 'br' || s.type === 'reg' ? 'clique num estado para entrar' : 'clique num município para abrir'}</span>`;
-  $('#mapHint').textContent = COARSE ? 'toque para abrir · dois dedos para zoom · arraste para o lado para mover' : 'role para zoom · arraste para mover · Shift+clique fixa para comparar';
+  $('#mapScope').innerHTML = `<b>${esc(scopeName(s))}</b><br><span style="color:var(--mut)">${s.type === 'br' || s.type === 'reg' ? (COARSE ? 'toque' : 'clique') + ' num estado para entrar' : (COARSE ? 'toque' : 'clique') + ' num município para abrir'}</span>`;
+  $('#mapHint').textContent = COARSE ? 'toque para abrir · dois dedos para dar zoom e mover o mapa' : 'role para zoom · arraste para mover · Shift+clique fixa para comparar';
 }
 function renderAll() { const s = SCOPE, b = caseB(s), sc = scenScope(s); renderCrumbs(); renderHeader(s, b, sc); renderTabs(); renderTab(); }
 function updateHash() { const s = SCOPE; const h = (s.type === 'br' ? '' : s.type + '=' + encodeURIComponent(s.reg || s.uf || s.id)) + (TAB !== 'geral' ? (s.type === 'br' ? '' : '&') + 'tab=' + TAB : ''); try { history.replaceState(null, '', '#' + h); } catch (e) {} }
@@ -861,13 +878,13 @@ $('#methodBox').innerHTML = `<h2>Método e glossário</h2><p>As <b>mesmas pessoa
 <p style="color:var(--mut)">Fontes: TSE (resultados oficiais 2026, 100% apurado; dados abertos de 2018 e 2022); malha municipal do IBGE; G1 (apoio dos governadores eleitos, 05/10/2026). Cálculos próprios.</p><button class="btn pri" id="btnCloseMethod">Fechar</button>`;
 $('#btnMethod').onclick = () => { $('#method').hidden = false; }; $('#method').addEventListener('mousedown', e => { if (e.target.id === 'method' || e.target.id === 'btnCloseMethod') $('#method').hidden = true; });
 const TOUR = [
-  { sel: '#metricBar', t: 'Escolha o que o mapa mostra', d: 'Indicadores de 2026 à esquerda e comparações com Jair à direita. Experimente "Flávio − Jair 2022". Passe o mouse na escala de cores para destacar uma faixa.' },
-  { sel: '#mapStage', t: 'Navegue pelo mapa', d: 'Clique num estado para entrar e num município para abrir o caso. Role para dar zoom, arraste para mover e use Shift+clique para fixar um município para comparar.' },
+  { sel: '#metricBar', t: 'Escolha o que o mapa mostra', d: 'Indicadores de 2026 à esquerda e comparações com Jair à direita. Experimente "Flávio − Jair 2022". ' + (COARSE ? 'Toque' : 'Passe o mouse') + ' na escala de cores para destacar uma faixa.' },
+  { sel: '#mapStage', t: 'Navegue pelo mapa', d: COARSE ? 'Toque num estado para entrar e num município para abrir o caso. Use dois dedos para dar zoom e mover o mapa, e o botão "Fixar para comparar" para comparar dois lugares.' : 'Clique num estado para entrar e num município para abrir o caso. Role para dar zoom, arraste para mover e use Shift+clique para fixar um município para comparar.' },
   { sel: '#caseHeader', t: 'O caso aberto', d: 'Os números principais: Flávio x Lula, governador, voto cruzado e a diferença em relação a Jair em 2022.' },
   { sel: '#tabs', tab: 'jair', t: 'Flávio x Jair', d: 'Trajetória 2018, 2022 e 2026, onde Flávio ganhou ou perdeu em relação ao pai e um gráfico com cada município.' },
   { sel: '#tabs', tab: 'conta', t: 'A conta exata', d: 'De onde vem a diferença entre os votos dos não-lulistas para governador e os votos de Flávio. Sem estimativa.' },
   { sel: '#tabs', tab: 'fluxos', t: 'Fluxos e hipóteses', d: 'Mexa nas hipóteses e veja quantos eleitores de Lula votaram em governador não-lulista. A parte escura do medidor é certeza.' },
-  { sel: '#btnSearch', t: 'Busca rápida', d: 'Aperte ⌘K (ou Ctrl+K, ou /) e digite qualquer cidade. Shift+Enter fixa o resultado para comparar.' }];
+  { sel: '#btnSearch', t: 'Busca rápida', d: COARSE ? 'Toque aqui e digite qualquer cidade ou estado para abrir direto.' : 'Aperte ⌘K (ou Ctrl+K, ou /) e digite qualquer cidade. Shift+Enter fixa o resultado para comparar.' }];
 let TI = -1;
 function tourShow() { const st = TOUR[TI]; if (st.tab) setTab(st.tab); const el = $(st.sel); el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); setTimeout(() => { const r = el.getBoundingClientRect(), hole = $('#tourHole'), card = $('#tourCard'); hole.style.left = (r.left - 6) + 'px'; hole.style.top = (r.top - 6) + 'px'; hole.style.width = (r.width + 12) + 'px'; hole.style.height = (Math.min(r.height, innerHeight - 40) + 12) + 'px'; card.innerHTML = `<h4>${st.t}</h4><p>${st.d}</p><div class="row"><span class="rstat">${TI + 1} de ${TOUR.length}</span><div class="row"><button class="btn" id="tPrev" ${TI === 0 ? 'disabled' : ''}>Voltar</button><button class="btn pri" id="tNext">${TI === TOUR.length - 1 ? 'Concluir' : 'Próximo'}</button></div></div>`; const below = r.bottom + 16 + 190 < innerHeight; card.style.top = (below ? r.bottom + 16 : Math.max(16, r.top - 200)) + 'px'; card.style.left = Math.min(innerWidth - card.offsetWidth - 16, Math.max(16, r.left)) + 'px'; $('#tPrev').onclick = () => { TI--; tourShow(); }; $('#tNext').onclick = () => { if (TI === TOUR.length - 1) tourEnd(); else { TI++; tourShow(); } }; }, 260); }
 function tourStart() { TI = 0; $('#tourLayer').hidden = false; tourShow(); }
@@ -878,7 +895,8 @@ $('#foot').innerHTML = 'Fontes: TSE (resultados oficiais do 1º turno de 04/10/2
 /* ================= início ================= */
 function parseHash() { const h = (location.hash || '').replace('#', ''); const q = Object.fromEntries(h.split('&').filter(Boolean).map(p => { const i = p.indexOf('='); return [p.slice(0, i), decodeURIComponent(p.slice(i + 1))]; })); let s = { type: 'br' }; if (q.uf && DATA.ufs[q.uf]) s = { type: 'uf', uf: q.uf }; else if (q.mun && byId[q.mun]) s = { type: 'mun', id: q.mun }; else if (q.reg && REGS.includes(q.reg)) s = { type: 'reg', reg: q.reg }; if (q.tab) TAB = q.tab; return s; }
 let resizeT = 0;
-window.addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(() => { sizeMap(); VIEW = fitView(bboxOfScope(SCOPE)); drawMap(); if (TAB === 'jair' || TAB === 'disp') renderTab(); }, 120); });
+let lastW = window.innerWidth;
+window.addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(() => { const wChanged = Math.abs(window.innerWidth - lastW) > 2; lastW = window.innerWidth; sizeMap(); if (wChanged) { VIEW = fitView(bboxOfScope(SCOPE)); if (['jair', 'disp', 'conta', 'fluxos'].includes(TAB)) renderTab(); } drawMap(); }, 120); });
 syncSliders(); renderMetricBar(); renderLegend(); sizeMap();
 SCOPE = parseHash(); VIEW = fitView(WB); drawMap(); renderAll(); animateTo(fitView(bboxOfScope(SCOPE)), 700);
 window.__app = { setScope, setTab, PRM, UFAGG, BRAGG, byId, palOpen, tourStart, get SCOPE() { return SCOPE; }, get VIEW() { return VIEW; } };

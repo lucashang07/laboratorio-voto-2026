@@ -2,7 +2,7 @@
 <html lang="pt-BR" data-theme="dark">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Apuração ao vivo · 2º turno 2026 · Laboratório do voto</title>
 <meta name="description" content="Apuração do 2º turno de 2026 com dados oficiais do TSE atualizados a cada minuto, comparada com o 2º turno de 2022 e o 1º turno de 2026, no Brasil e em cada região.">
 <meta name="robots" content="noindex">
@@ -211,6 +211,13 @@ table.t tr.sel td{background:var(--panel2)}
   .cd b{font-size:21px}
   .rb{grid-template-columns:82px minmax(0,1fr) 56px}
   .hideM{display:none}
+  .actions{gap:8px}
+  .updinfo{flex:1 1 auto;min-width:0;white-space:normal}
+  .actions>div:last-child{flex:0 0 auto}
+  .chip{padding:7px 12px}
+  .lgi{padding:6px 8px}
+  .seg button{padding:8px 12px}
+  .tile .p{font-size:9px}
 }
 [data-theme=dark]{--j22:#67e8f9;--l22:#fdba74;--f1t:#c4b5fd;--l1t:#f9a8d4;--mix:#fde047;--g22:#cbd5e1;--g1t:#94a3b8}
 [data-theme=light]{--j22:#0891b2;--l22:#ea580c;--f1t:#7c3aed;--l1t:#db2777;--mix:#a16207;--g22:#334155;--g1t:#64748b}
@@ -641,7 +648,7 @@ function render() {
     else if (S.status === 'nofile') setStatus('wait', 'Aguardando o 2º turno');
     else if (S.status === 'err') setStatus('err', 'Sem conexão com o TSE');
     else setStatus('wait', 'Carregando…');
-    $('#updTse').innerHTML = cur ? `TSE: <b>${esc(cur.at.split(' ')[1] || '')}</b> de ${esc((cur.at.split(' ')[0] || '').slice(0, 5))}` : (S.status === 'nofile' ? 'TSE: arquivos do 2º turno ainda não publicados' : (S.err ? esc(S.err) : '—'));
+    $('#updTse').innerHTML = cur ? `TSE: <b>${esc(cur.at.split(' ')[1] || '')}</b> de ${esc((cur.at.split(' ')[0] || '').slice(0, 5))}` : (S.status === 'nofile' ? 'TSE: 2º turno ainda não publicado' : (S.err ? esc(S.err) : '—'));
   } else { $('#updTse').innerHTML = 'Ensaio com dados reais de ' + (S.ensKey === '2t2022' ? '2022' : '2026'); $('#updNext').textContent = 'horário simulado'; }
   if (S.err && S.mode === 'live' && cur) $('#updTse').innerHTML += ` · <span class="dn">${esc(S.err)}</span>`;
   S.events = buildEvents();
@@ -852,7 +859,9 @@ function toast(m) { const t = document.createElement('div'); t.className = 'toas
 $('#btnRefresh').onclick = () => { if (S.mode === 'ensaio') { toast('No ensaio, os dados avançam sozinhos'); return; } refresh(true); };
 $('#btnTheme').onclick = () => { const n = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', n); try { localStorage.setItem('lv-theme', n); } catch (e) {} render(); };
 $$('#segX button').forEach(b => b.onclick = () => { S.xMode = b.dataset.v; $$('#segX button').forEach(x => x.classList.toggle('on', x === b)); renderEvo(); renderDiff(); });
-let rsz; window.addEventListener('resize', () => { clearTimeout(rsz); rsz = setTimeout(() => { renderEvo(); renderProg(); renderDiff(); renderSmalls(); }, 150); });
+let rsz, lastW = window.innerWidth; window.addEventListener('resize', () => { clearTimeout(rsz); rsz = setTimeout(() => { if (Math.abs(window.innerWidth - lastW) < 3) return; lastW = window.innerWidth; renderEvo(); renderProg(); renderDiff(); renderSmalls(); }, 150); });
+// no celular, tocar fora de um gráfico fecha a caixinha de valores
+document.addEventListener('touchstart', e => { if (e.target.closest && e.target.closest('.chart')) return; $$('.chart .ctip').forEach(t => t.hidden = true); $$('.chart .xh').forEach(l => l.setAttribute('visibility', 'hidden')); $$('.chart .hdots').forEach(g => g.innerHTML = ''); }, { passive: true });
 
 // ---------- início ----------
 (async function init() {
