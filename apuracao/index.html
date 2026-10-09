@@ -251,6 +251,7 @@ table.t tr.sel td{background:var(--panel2)}
     <div class="updinfo"><div id="updTse">—</div><div id="updNext">—</div></div>
     <div style="display:flex;gap:8px">
       <button class="btn" id="btnRefresh" title="Buscar os dados do TSE agora"><svg class="ring" viewBox="0 0 20 20"><circle class="bg" cx="10" cy="10" r="7.5"/><circle class="fg" id="ringFg" cx="10" cy="10" r="7.5" stroke-dasharray="47.1" stroke-dashoffset="0"/></svg><span>Atualizar</span></button>
+      <a class="btn hideM" href="../batalha/" title="A apuração como uma batalha por território">Batalha</a>
       <a class="btn hideM" href="../">Laboratório</a>
       <button class="btn icon" id="btnTheme" title="Tema claro/escuro">◐</button>
     </div>
@@ -851,7 +852,7 @@ function renderLog() {
 function renderFoot() {
   $('#foot').innerHTML = `<b>Fontes.</b> Resultados ao vivo: arquivos públicos de divulgação do TSE (resultados.tse.jus.br), consultados direto pelo seu navegador a cada minuto. Curvas de 2022 e do 1º turno de 2026: boletins de urna publicados pelo TSE (dados abertos), somados na ordem em que cada boletim chegou ao TSE. A reconstrução de 2022 bate com cópias dos arquivos do TSE salvas naquela noite pelo Internet Archive (17h23: 4,1% apurado e Jair 53,9%, contra 3,96% e 54,04% no TSE; 18h22: 45,8% e 50,45%, contra 45,28% e 50,47%; 19h43: 98,12% e Lula 50,78%, igual ao TSE).<br>
   <b>Como ler.</b> "% apurado" = seções totalizadas pelo TSE. "Mix de estados 2022" e "votos que faltam" são contas simples feitas aqui, não projeções oficiais: a primeira aplica o resultado de 2022 de cada estado aos votos já apurados nele; a segunda multiplica o eleitorado que falta apurar em cada estado pela proporção de votos válidos já observada nele. Quem declara o eleito é o TSE. Inclui os votos do exterior, como o TSE.<br>
-  <b>Atualização.</b> Automática a cada 60 segundos, mais o botão Atualizar. ${S.mode === 'live' ? `O histórico da noite fica salvo neste aparelho${S.serverHist ? ` e foi completado com ${S.serverHist} ${S.serverHist === 1 ? 'registro' : 'registros'} do coletor automático` : ''}.` : ''} <a href="../">Voltar ao Laboratório do voto</a>.`;
+  <b>Atualização.</b> Automática a cada 60 segundos, mais o botão Atualizar. ${S.mode === 'live' ? `O histórico da noite fica salvo neste aparelho${S.serverHist ? ` e foi completado com ${S.serverHist} ${S.serverHist === 1 ? 'registro' : 'registros'} do coletor automático` : ''}.` : ''} <a href="../batalha/">Ver a apuração como batalha</a> · <a href="../">Voltar ao Laboratório do voto</a>.`;
 }
 function toast(m) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = m; document.body.appendChild(t); setTimeout(() => t.remove(), 2400); }
 
