@@ -57,6 +57,7 @@ a{color:inherit}
 .army .rank{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);font-weight:700}
 .badge{display:inline-block;white-space:nowrap;font-size:9.5px;letter-spacing:.1em;padding:2px 7px;border-radius:999px;border:1px solid rgba(251,191,36,.55);color:var(--gold);margin:0 4px;vertical-align:1px}
 .badge.win{background:var(--gold);color:#111;border-color:var(--gold)}
+.badge.showM{display:none}
 .ufgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(66px,1fr));gap:6px;margin-top:8px}
 .uft{position:relative;border-radius:9px;padding:6px 8px 8px;background:#151c2c;border:1px solid rgba(255,255,255,.07);font-size:12.5px;font-weight:850;line-height:1.1;overflow:hidden;cursor:default}
 .uft small{display:block;font-weight:600;font-size:10.5px;opacity:.9;margin-top:3px;font-variant-numeric:tabular-nums}
@@ -146,6 +147,7 @@ a{color:inherit}
   .hudtr b{font-size:18px}
   .banner{font-size:20px}
   .hideM{display:none}
+  .badge.showM{display:inline-block;font-size:8.5px;padding:1px 5px;margin:0 3px}
 }
 </style>
 </head>
@@ -424,12 +426,12 @@ function renderBoard() {
   const mom = side => { if (!fr || S.idx < 1) return ''; let j = S.idx; while (j > 0 && S.frames[j].m > fr.m - 10) j--; const f0 = S.frames[j], v0 = f0.br.F + f0.br.L + (f0.br.O || 0); if (j === S.idx || !v0 || !vv) return ''; const d = (side === 'F' ? 100 * br.F / vv - 100 * f0.br.F / v0 : 100 * br.L / vv - 100 * f0.br.L / v0); if (Math.abs(d) < 0.05) return '<span style="color:var(--mut)">estável</span>'; return d > 0 ? `<span style="color:var(--ok)">▲ ${dec(d, 1)} p.p.</span>` : `<span style="color:#f87171">▼ ${dec(-d, 1)} p.p.</span>`; };
   const lastOf = side => { const ev = S.events.filter(e => e.k <= S.idx && e.side === side && e.kind !== 'mile' && e.kind !== 'start').pop(); return ev ? `Última conquista: <b>${hhmm(ev.m)}</b> · ${esc(ev.short || ev.t)}` : 'Aguardando o primeiro combate.'; };
   const lead = vv ? (br.F >= br.L ? 'F' : 'L') : null, fin22 = S.mode === 'r22' && br && br.st >= br.ts, winA = S.eleito === 'F' || (fin22 && br.F > br.L), winB = S.eleito === 'L' || (fin22 && br.L > br.F), wtx = S.mode === 'live' ? 'eleito' : 'venceu';
-  $('#armyA').innerHTML = `<div class="hd">${shield('#2563eb', M.ashort[0])}<div><div class="rank"><span class="hideM">Exército </span>azul</div><div class="nm">${esc(M.a)}</div></div></div>
-    <div class="big${pa == null ? ' off' : ''}">${pa == null ? '00,00%' : fmtP(pa, 2)}</div><div class="sub">${br ? fmtN(br.F) + ' votos' : 'votos válidos'}${winA ? `<span class="badge win">${wtx}</span>` : lead === 'F' ? '<span class="badge">na frente</span>' : ''}</div>
+  $('#armyA').innerHTML = `<div class="hd">${shield('#2563eb', M.ashort[0])}<div><div class="rank"><span class="hideM">Exército </span>azul${winA ? `<span class="badge win showM">${wtx}</span>` : lead === 'F' ? '<span class="badge showM">na frente</span>' : ''}</div><div class="nm">${esc(M.a)}</div></div></div>
+    <div class="big${pa == null ? ' off' : ''}">${pa == null ? '00,00%' : fmtP(pa, 2)}</div><div class="sub">${br ? fmtN(br.F) + ' votos' : 'votos válidos'}${winA ? `<span class="badge win hideM">${wtx}</span>` : lead === 'F' ? '<span class="badge hideM">na frente</span>' : ''}</div>
     <div class="stats"><div class="stat"><span>Território</span><b>${dec(ta, 1)}% do mapa</b></div><div class="stat"><span>Estados</span><b>${sa} de 27</b></div><div class="stat"><span>Ritmo (10 min)</span><b>${mom('F') || '<span style="color:var(--mut)">aguardando</span>'}</b></div></div>
     <div class="last">${lastOf('F')}</div>`;
-  $('#armyB').innerHTML = `<div class="hd">${shield('#dc2626', M.bshort[0])}<div><div class="rank"><span class="hideM">Exército </span>vermelho</div><div class="nm">${esc(M.b)}</div></div></div>
-    <div class="big${pb == null ? ' off' : ''}">${pb == null ? '00,00%' : fmtP(pb, 2)}</div><div class="sub">${winB ? `<span class="badge win">${wtx}</span>` : lead === 'L' ? '<span class="badge">na frente</span>' : ''}${br ? fmtN(br.L) + ' votos' : 'votos válidos'}</div>
+  $('#armyB').innerHTML = `<div class="hd">${shield('#dc2626', M.bshort[0])}<div><div class="rank">${winB ? `<span class="badge win showM">${wtx}</span>` : lead === 'L' ? '<span class="badge showM">na frente</span>' : ''}<span class="hideM">Exército </span>vermelho</div><div class="nm">${esc(M.b)}</div></div></div>
+    <div class="big${pb == null ? ' off' : ''}">${pb == null ? '00,00%' : fmtP(pb, 2)}</div><div class="sub">${winB ? `<span class="badge win hideM">${wtx}</span>` : lead === 'L' ? '<span class="badge hideM">na frente</span>' : ''}${br ? fmtN(br.L) + ' votos' : 'votos válidos'}</div>
     <div class="stats"><div class="stat"><span>Território</span><b>${dec(tb, 1)}% do mapa</b></div><div class="stat"><span>Estados</span><b>${sb} de 27</b></div><div class="stat"><span>Ritmo (10 min)</span><b>${mom('L') || '<span style="color:var(--mut)">aguardando</span>'}</b></div></div>
     <div class="last">${lastOf('L')}</div>`;
   $('#tugA').style.width = (pa != null ? pa : 50) + '%'; $('#tugO').style.width = po + '%'; $('#tugB').style.width = (pb != null ? pb : 50) + '%';
