@@ -16,6 +16,10 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="750">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.png">
+<link rel="apple-touch-icon" href="icone-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Barlow+Condensed:wght@400;500;600;700;800&family=Special+Elite&display=swap" rel="stylesheet">
@@ -226,9 +230,35 @@ body.tv.idle .tvexit{opacity:0}
 body.tv .banner .bt{font-size:52px}
 body.tv .banner .bs{font-size:20px}
 @media(max-width:640px){.reinf .rf-top{grid-template-columns:1fr 1fr}.reinf .rf-top div:first-child{grid-column:1/3}.reinf .rf-row{grid-template-columns:84px minmax(0,1fr)}.reinf .rf-v{grid-column:1/3;text-align:left;margin-top:-3px}}
+.more{position:relative}
+.more>summary{list-style:none;cursor:pointer;user-select:none}
+.more>summary::-webkit-details-marker{display:none}
+.more>summary::after{content:'';display:inline-block;margin-left:7px;border:4px solid transparent;border-top-color:currentColor;vertical-align:-1px}
+.more[open]>summary{border-color:var(--amber);color:var(--amber2)}
+.more .menu{position:absolute;right:0;top:calc(100% + 6px);z-index:60;min-width:200px;background:#12150f;border:1px solid var(--line2);border-radius:6px;padding:6px;display:flex;flex-direction:column;gap:2px;box-shadow:0 14px 34px rgba(0,0,0,.6)}
+.more .mi{display:block;text-align:left;background:transparent;border:0;color:var(--ink);font:inherit;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:13.5px;padding:9px 12px;border-radius:4px;text-decoration:none;cursor:pointer;white-space:nowrap}
+.more .mi:hover{background:var(--panel2);color:var(--amber2)}
+@media(max-width:1320px){.top .btn,.modes button{padding:7px 9px;font-size:12.5px;letter-spacing:.04em}}
+.govlinks{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px}
+.govlinks a{text-decoration:none;border:1px solid var(--line2);background:var(--panel2);border-radius:4px;padding:6px 11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:13px}
+.govlinks a:hover{border-color:var(--amber);color:var(--amber2)}
+.bolao label{display:block;margin:10px 0;font-weight:700;letter-spacing:.04em;color:var(--ink)}
+.bolao input[type=text],.bolao input:not([type]),.bolao select{display:block;width:100%;margin-top:5px;background:#0b0d09;border:1px solid var(--line2);border-radius:4px;color:var(--ink);padding:8px 10px;font-size:16px}
+.bolao input[type=range]{display:block;width:100%;margin-top:8px;accent-color:var(--amber)}
+.bolao .bgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bolao h3{margin:16px 0 6px;font-size:12.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--mut)}
+.bt-row{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:14px;border-top:1px dashed var(--line2);padding:6px 0}
+.bt-row button{border:1px solid var(--line2);background:transparent;color:var(--mut);border-radius:4px;font-size:12px;padding:2px 8px;cursor:pointer}
+.btab{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+.btab th{text-align:left;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);border-bottom:1px solid var(--line2);padding:5px 6px}
+.btab td{border-bottom:1px dashed var(--line);padding:6px}
+.btab tr.me td{color:var(--amber2);font-weight:700}
+.bolaoP .btn{margin-top:8px}
+@media(max-width:640px){.bolao .bgrid{grid-template-columns:1fr}.btab{font-size:12.5px}.btab th:nth-child(5),.btab td:nth-child(5){display:none}}
 @media(max-width:1180px){.theater{grid-template-columns:1fr 1fr}.theater .mapbox{grid-column:1/3;grid-row:2}.console{grid-template-columns:1fr}}
 @media(max-width:640px){
-  .top{gap:7px;padding:8px 10px;position:static}
+  .top{gap:7px;padding:8px 10px;position:relative;z-index:30}
+  .top .btn{padding:6px 8px;font-size:12px;letter-spacing:.03em}
   .ttl{font-size:16px}.ttl small{display:none}
   .modes{order:5;width:100%}.modes button{flex:1;padding:8px 4px;font-size:12px;letter-spacing:.02em}
   .wrap{padding:8px 8px 24px}
@@ -253,11 +283,18 @@ body.tv .banner .bs{font-size:20px}
   <div class="modes" id="modes"><button data-m="live">Ao vivo</button><button data-m="sim">Simulação</button><button data-m="r22">Reprise 2022</button><button data-m="r26">1º turno</button></div>
   <button class="btn" id="btnSom" title="Sons de batalha (artilharia, sirene, telégrafo)">Som: off</button>
   <button class="btn" id="btnNar" title="Correspondente de guerra lê os despachos em voz alta">Narrador: off</button>
-  <button class="btn hideM" id="btnCam" title="Câmera que segue os combates">Câmera: auto</button>
-  <button class="btn hideM" id="btnTV" title="Tela cheia para assistir na TV">Telão</button>
-  <button class="btn" id="btnRegras">Regras</button>
-  <a class="btn hideM" href="../apuracao/">Apuração</a>
+  <button class="btn" id="btnAlr" title="Avisos no celular ou no computador nas viradas e no resultado, mesmo com a aba em segundo plano">Alertas: off</button>
+  <button class="btn" id="btnBolao" title="Seu palpite para o 2º turno, para disputar com a turma">Bolão</button>
+  <details class="more" id="more"><summary class="btn">Mais</summary><div class="menu">
+    <button class="mi" id="btnRegras">Regras</button>
+    <button class="mi hideM" id="btnTV" title="Tela cheia para assistir na TV">Telão</button>
+    <button class="mi hideM" id="btnCam" title="Câmera que segue os combates">Câmera: auto</button>
+    <a class="mi" href="governador/" title="Batalhas do 2º turno para governador">Governadores</a>
+    <a class="mi" href="../apuracao/">Apuração</a>
+    <a class="mi" href="arcade/">Versão arcade</a>
+  </div></details>
 </header>
+<script>document.addEventListener('click',function(e){var d=document.getElementById('more');if(!d||!d.open)return;if(!d.contains(e.target)||e.target.closest('.mi'))d.open=false;});</script>
 <div id="errbox" hidden></div>
 <main class="wrap">
   <section class="theater">
@@ -289,6 +326,10 @@ body.tv .banner .bs{font-size:20px}
       <div class="sharebar"><span class="lbl">Compartilhar</span><button class="btn pri" id="btnStory">Imagem para Stories</button><button class="btn" id="btnVideo">Gravar vídeo (20 s)</button><button class="btn hideM" id="btnImg">Imagem horizontal</button></div>
       <h3 style="margin-top:16px">Reforços a caminho · o que falta apurar</h3>
       <div class="reinf" id="reinf"></div>
+      <h3 style="margin-top:16px">Bolão da turma</h3>
+      <div class="bolaoP" id="bolaoP"></div>
+      <h3 style="margin-top:16px">Frentes estaduais · 2º turno para governador</h3>
+      <div class="govlinks"><a href="governador/?uf=ac">Acre</a><a href="governador/?uf=am">Amazonas</a><a href="governador/?uf=df">Distrito Federal</a><a href="governador/?uf=es">Espírito Santo</a><a href="governador/?uf=rn">Rio Grande do Norte</a><a href="governador/?uf=to">Tocantins</a></div>
       <h3 style="margin-top:16px">Frentes de batalha · território controlado</h3>
       <div class="fronts" id="fronts"></div>
       <h3 style="margin-top:16px">Capitais</h3>
@@ -309,6 +350,15 @@ body.tv .banner .bs{font-size:20px}
   <div class="mmprev" id="mmPrev"></div>
   <div class="ovbtns"><button class="btn pri" id="mmDown">Baixar</button><button class="btn pri" id="mmShare" hidden>Compartilhar</button><button class="btn" id="mmClose">Fechar</button></div>
 </div></div>
+<div class="modal" id="bolaoModal" hidden><div class="box bolao">
+  <h2>Bolão da batalha</h2>
+  <p>Faça seu palpite para o 2º turno e mande o link para a turma. Na noite de 25/10, a página mostra quem chegou mais perto. Os palpites ficam salvos só neste aparelho.</p>
+  <label>Seu nome<input id="bNome" maxlength="20" placeholder="Como a turma te chama"></label>
+  <label>Placar final (votos válidos): <b id="bPctL"></b><input type="range" id="bPct" min="40" max="60" step="0.1"></label>
+  <div class="bgrid"><label>Hora em que o TSE declara o eleito<select id="bHora"></select></label><label>Estado mais apertado<select id="bUf"></select></label></div>
+  <div class="ovbtns"><button class="btn pri" id="bSalvar">Salvar palpite</button><button class="btn pri" id="bStory">Card para Stories</button><button class="btn" id="bLink">Enviar link</button><button class="btn" id="bFechar">Fechar</button></div>
+  <h3>Palpites da turma</h3><div id="bTurma"></div>
+</div></div>
 <div class="modal" id="regras" hidden><div class="box">
   <h2>Regras de engajamento</h2>
   <ul>
@@ -322,6 +372,8 @@ body.tv .banner .bs{font-size:20px}
     <li><b>Vitória matemática.</b> Aparece quando a vantagem de um lado fica maior que todos os eleitores que ainda faltam apurar. É um limite seguro, não uma projeção.</li>
     <li><b>Reforços a caminho.</b> Mostra quantos eleitores ainda faltam apurar, onde estão e como essas mesmas áreas votaram no 1º turno de 2026. Não é previsão: é o mapa do que falta chegar.</li>
     <li><b>Fantasma de 2022.</b> A linha tracejada clara mostra onde estava a frente de batalha de 2022 com o mesmo percentual apurado, e o cabo de guerra marca o placar de 2022 naquele ponto.</li>
+    <li><b>Alertas e bolão.</b> Os alertas avisam no celular ou no computador quando há virada, vitória matemática ou resultado final, mesmo com a aba em segundo plano (no iPhone, só com a página adicionada à Tela de Início). O bolão guarda seu palpite neste aparelho e gera um link para a turma; quem abre o link entra no seu ranking.</li>
+    <li><b>Frentes estaduais.</b> As batalhas do 2º turno para governador (AC, AM, DF, ES, RN e TO) usam o resultado real de cada município, com cores neutras, já que não são disputas entre os mesmos lados da eleição presidencial.</li>
     <li><b>Narrador, telão e vídeo.</b> O narrador lê os despachos em voz alta (voz do próprio aparelho). O telão deixa o mapa em tela cheia para a TV. O botão de vídeo grava a batalha inteira em cerca de 20 segundos, no formato vertical, pronto para Reels, Stories e WhatsApp.</li>
   </ul>
   <p>É um jeito de acompanhar a apuração com mais emoção. Quem declara o eleito é o TSE. Prefere o tabuleiro de hexágonos? <a href="arcade/">Versão arcade</a>.</p>
@@ -1016,7 +1068,7 @@ function renderBoard() {
   if (S.mode === 'r26') lg.push('<span><i style="background:#8b7bd8"></i>Outros (só no cabo de guerra)</span>');
   if (ghostActive()) lg.push('<span><i style="height:0;border-top:2px dashed #f5f0dc;border-radius:0"></i>Fantasma de 2022 (mesmo % apurado)</span>');
   $('#legend').innerHTML = lg.join('');
-  renderGhostUI(fr); renderReinf(fr);
+  renderGhostUI(fr); renderReinf(fr); bolRender();
 }
 function renderFronts(fr) {
   const el = $('#fronts');
@@ -1125,6 +1177,7 @@ function fireEffects(prevIdx) {
   const ban = fresh.filter(e => e.banner).pop();
   if (ban && fresh.length < 40) showBanner(ban.banner, ban.side, ban.m);
   narEvents(fresh);
+  alrEvents(fresh);
   if (camEv) {
     if (camEv.kind === 'flip' && CAPOF[camEv.uf]) camFocus(CAPOF[camEv.uf].x, CAPOF[camEv.uf].y, camEv.uf === 'zz' ? 1.6 : 2.0, 2600);
     else if (camEv.kind === 'sweep' && REGC[camEv.reg]) camFocus(REGC[camEv.reg][0], REGC[camEv.reg][1], 1.5, 2400);
@@ -1745,6 +1798,132 @@ function updTicker() {
 }
 
 // ---------------------------------------------------------------------
+// Alertas do front (notificações do navegador, inclusive com a aba em segundo plano)
+// ---------------------------------------------------------------------
+const ALR = { on: false, reg: null, last: 0, base: './' };
+const ALR_KINDS = { nat: 1, decid: 1, end: 1, eleito: 1, flip: 1 };
+const ALR_BIG = new Set(['sp', 'mg', 'rj', 'ba', 'rs', 'pr', 'pe', 'ce', 'pa', 'sc', 'go', 'am']);
+function alrInit() {
+  ALR.base = location.pathname.indexOf('/governador') >= 0 ? '../' : './';
+  if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register(ALR.base + 'sw.js', { scope: ALR.base }).then(r => { ALR.reg = r; }).catch(() => {}); } catch (e) {} }
+  try { ALR.on = localStorage.getItem('batalha:alertas') === '1' && 'Notification' in window && Notification.permission === 'granted'; } catch (e) {}
+  alrBtn();
+}
+function alrBtn() { const b = $('#btnAlr'); if (!b) return; b.textContent = 'Alertas: ' + (ALR.on ? 'on' : 'off'); b.classList.toggle('on', ALR.on); }
+async function alrToggle() {
+  if (!('Notification' in window)) { toast(/iPhone|iPad/.test(navigator.userAgent) ? 'No iPhone, adicione a página à Tela de Início para receber alertas' : 'Este navegador não mostra alertas'); return; }
+  if (ALR.on) { ALR.on = false; try { localStorage.setItem('batalha:alertas', '0'); } catch (e) {} alrBtn(); toast('Alertas desligados'); return; }
+  let p = Notification.permission;
+  if (p !== 'granted') { try { p = await Notification.requestPermission(); } catch (e) { p = 'denied'; } }
+  if (p !== 'granted') { toast('Os alertas foram bloqueados nas permissões do navegador'); return; }
+  ALR.on = true; try { localStorage.setItem('batalha:alertas', '1'); } catch (e) {} alrBtn();
+  alrShow('Alertas do front ativados', 'Você vai ser avisado das viradas, da vitória matemática e do resultado final, mesmo com esta aba em segundo plano.', 'teste');
+}
+function alrShow(title, body, tag) {
+  const opts = { body, tag: 'batalha-' + tag, icon: ALR.base + 'icone-192.png', badge: ALR.base + 'icone-192.png', renotify: true, data: { url: location.href } };
+  const fallback = () => { try { const n = new Notification(title, opts); n.onclick = () => { window.focus(); n.close(); }; } catch (e) {} };
+  try { if (ALR.reg && ALR.reg.showNotification) { ALR.reg.showNotification(title, opts).catch(fallback); return; } } catch (e) {}
+  fallback();
+}
+function alrEvents(fresh) {
+  if (!ALR.on || S.mode !== 'live' || !fresh.length) return;
+  if (!document.hidden && document.hasFocus && document.hasFocus()) return;
+  const now = Date.now();
+  for (const e of fresh) {
+    if (!ALR_KINDS[e.kind]) continue;
+    if (e.kind === 'flip' && !(ALR_BIG.has(e.uf) || (CAPOF[e.uf] && CAPOF[e.uf].nat))) continue;
+    if (e.kind === 'flip' && now - ALR.last < 20000) continue;
+    ALR.last = now;
+    alrShow(`${e.banner ? e.banner[0] : 'Despacho do front'} · ${clk(e.m)}`, e.t, e.kind + '-' + (e.uf || '') + '-' + e.k);
+  }
+}
+
+// ---------------------------------------------------------------------
+// Bolão da batalha: palpites salvos no aparelho e trocados por link
+// ---------------------------------------------------------------------
+const BOL = { me: null, turma: [] };
+function bolLoad() { try { const o = JSON.parse(localStorage.getItem('batalha:bolao') || '{}'); BOL.me = o.me || null; BOL.turma = Array.isArray(o.turma) ? o.turma : []; } catch (e) {} }
+function bolSave() { try { localStorage.setItem('batalha:bolao', JSON.stringify({ me: BOL.me, turma: BOL.turma })); } catch (e) {} }
+const b64e = s => btoa(unescape(encodeURIComponent(s))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const b64d = s => decodeURIComponent(escape(atob(s.replace(/-/g, '+').replace(/_/g, '/'))));
+function bolLink(p) { const u = new URL(location.origin + location.pathname); u.searchParams.set('palpite', b64e(JSON.stringify({ n: p.nome, p: p.pct, h: p.hora, u: p.uf }))); return u.toString(); }
+function bolFromURL() {
+  const s = params.get('palpite'); if (!s) return;
+  try {
+    const o = JSON.parse(b64d(s)), p = { nome: String(o.n || 'Anônimo').slice(0, 20), pct: +o.p, hora: String(o.h || '').slice(0, 5), uf: String(o.u || '').slice(0, 2) };
+    if (isFinite(p.pct) && p.pct >= 30 && p.pct <= 70 && !(BOL.me && BOL.me.nome === p.nome && BOL.me.pct === p.pct)) {
+      BOL.turma = BOL.turma.filter(x => x.nome !== p.nome); BOL.turma.push(p); bolSave();
+      setTimeout(() => toast(`Palpite de ${p.nome} entrou no seu bolão`), 1500);
+    }
+  } catch (e) {}
+  const u = new URL(location.href); u.searchParams.delete('palpite'); history.replaceState(null, '', u);
+}
+const UFSORT = () => UFS.filter(u => u !== 'zz').sort((a, b) => UFN[a].localeCompare(UFN[b], 'pt-BR'));
+function bolOpen() {
+  const me = BOL.me || { nome: '', pct: 50, hora: '19:45', uf: 'mg' };
+  $('#bNome').value = me.nome || ''; $('#bPct').value = me.pct;
+  if (!$('#bHora').options.length) { const hs = []; for (let t = 18 * 60; t <= 23 * 60; t += 5) hs.push(String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0')); $('#bHora').innerHTML = hs.map(h => `<option>${h}</option>`).join(''); $('#bUf').innerHTML = UFSORT().map(u => `<option value="${u}">${esc(UFN[u])}</option>`).join(''); }
+  $('#bHora').value = me.hora; $('#bUf').value = me.uf; bolPctLabel();
+  bolTurmaModal(); $('#bolaoModal').hidden = false;
+}
+function bolPctLabel() { const v = +$('#bPct').value; $('#bPctL').innerHTML = `<span style="color:var(--F2)">Flávio ${dec(v, 1)}%</span> x <span style="color:var(--L2)">${dec(100 - v, 1)}% Lula</span>`; }
+function bolCollect() { return { nome: ($('#bNome').value || 'Eu').trim().slice(0, 20) || 'Eu', pct: +(+$('#bPct').value).toFixed(1), hora: $('#bHora').value, uf: $('#bUf').value }; }
+function bolTurmaModal() { const el = $('#bTurma'); el.innerHTML = BOL.turma.length ? BOL.turma.map((p, i) => `<div class="bt-row"><span>${esc(p.nome)}: Flávio ${dec(p.pct, 1)}% · eleito às ${esc(p.hora || '?')} · ${esc((p.uf || '').toUpperCase())}</span><button data-i="${i}">remover</button></div>`).join('') : '<div class="rf-empty">Ninguém ainda. Quando alguém te mandar o link do palpite, ele aparece aqui.</div>'; el.querySelectorAll('button').forEach(b => b.onclick = () => { BOL.turma.splice(+b.dataset.i, 1); bolSave(); bolTurmaModal(); bolRender(); }); }
+function bolActual() {
+  if (S.mode !== 'live' && S.mode !== 'sim') return null;
+  const fr = S.frames[S.idx]; if (!fr) return null;
+  const br = fr.br, two = br.F + br.L; if (!two) return null;
+  const ev = S.events.filter(e => e.k <= S.idx), el = ev.find(e => e.kind === 'eleito') || ev.find(e => e.kind === 'decid');
+  let best = null;
+  for (const u of UFS) { if (u === 'zz') continue; const d = fr.uf && fr.uf[u]; if (!d || !d.ts || d.st / d.ts < 0.9 || !(d.F + d.L)) continue; const mg = Math.abs(d.F - d.L) / (d.F + d.L); if (!best || mg < best.mg) best = { u, mg }; }
+  return { pct: 100 * br.F / two, hora: el ? clk(el.m) : null, uf: best ? best.u : null, final: br.st >= br.ts, mode: S.mode };
+}
+function hm2min(h) { if (!h) return null; const [a, b] = h.split(':').map(Number); return (a < 12 ? a + 24 : a) * 60 + b; }
+function bolRender() {
+  const el = $('#bolaoP'); if (!el) return;
+  const act = bolActual(), all = [...(BOL.me ? [Object.assign({ eu: 1 }, BOL.me)] : []), ...BOL.turma];
+  if (!all.length) { el.innerHTML = '<div class="rf-empty">Faça seu palpite e mande o link para a turma. Na noite de 25/10, aqui aparece quem está chegando mais perto.</div><button class="btn pri" id="bolGo">Fazer meu palpite</button>'; $('#bolGo').onclick = bolOpen; return; }
+  const rows = all.map(p => Object.assign({}, p, { ep: act ? Math.abs(p.pct - act.pct) : null, eh: act && act.hora && p.hora ? Math.abs(hm2min(p.hora) - hm2min(act.hora)) : null }));
+  if (act) rows.sort((a, b) => a.ep - b.ep || (a.eh == null ? 9999 : a.eh) - (b.eh == null ? 9999 : b.eh));
+  el.innerHTML = `<table class="btab"><tr><th>#</th><th>Nome</th><th>Flávio</th><th>Eleito às</th><th>Mais apertado</th>${act ? '<th>Erro</th>' : ''}</tr>${rows.map((r, i) => `<tr class="${r.eu ? 'me' : ''}"><td>${i + 1}</td><td>${esc(r.nome)}${r.eu ? ' (você)' : ''}</td><td>${dec(r.pct, 1)}%</td><td>${esc(r.hora || '·')}</td><td>${esc((r.uf || '').toUpperCase())}${act && act.uf && r.uf === act.uf ? ' ✓' : ''}</td>${act ? `<td>${dec(r.ep, 2)} p.p.${r.eh != null ? ' · ' + r.eh + ' min' : ''}</td>` : ''}</tr>`).join('')}</table>`
+    + `<div class="rf-note">${act ? (act.mode === 'sim' ? 'Comparando com esta simulação, só por diversão.' : act.final ? 'Comparado com o resultado final do TSE.' : 'Parcial: muda a cada atualização do TSE.') + (act.hora ? ` Hora de referência: ${act.hora}.` : '') : 'O ranking aparece quando a apuração começar.'}</div><button class="btn" id="bolGo">Meu palpite</button>`;
+  $('#bolGo').onclick = bolOpen;
+}
+function bolCard(p) {
+  const W = 1080, H = 1920, c = mk(); c.width = W; c.height = H; const x = c.getContext('2d');
+  x.fillStyle = '#0a0c09'; x.fillRect(0, 0, W, H);
+  try { x.globalAlpha = 0.2; const sw = cv.width * 0.86, sh = cv.height, sc = Math.min(W / sw, 1100 / sh); x.drawImage(cv, cv.width * 0.07, 0, sw, sh, (W - sw * sc) / 2, 520, sw * sc, sh * sc); x.globalAlpha = 1; } catch (e) { x.globalAlpha = 1; }
+  { const g = x.createLinearGradient(0, 380, 0, 1000); g.addColorStop(0, 'rgba(10,12,9,0)'); g.addColorStop(0.18, 'rgba(10,12,9,.72)'); g.addColorStop(0.82, 'rgba(10,12,9,.72)'); g.addColorStop(1, 'rgba(10,12,9,0)'); x.fillStyle = g; x.fillRect(0, 380, W, 620); }
+  for (const [cx, col] of [[150, '60,123,226'], [930, '211,58,46']]) { const g = x.createRadialGradient(cx, 0, 10, cx, 0, 820); g.addColorStop(0, `rgba(${col},.32)`); g.addColorStop(1, `rgba(${col},0)`); x.fillStyle = g; x.fillRect(0, 0, W, H); }
+  x.textAlign = 'center'; x.fillStyle = '#e3a72f'; x.font = `700 34px ${CONDF}`; x.fillText(spaced('BATALHA DO VOTO · 2º TURNO 2026'), W / 2, 130);
+  x.fillStyle = '#e6e2cf'; x.font = `110px ${STENF}`; x.fillText('MEU PALPITE', W / 2, 270);
+  x.font = `800 44px ${CONDF}`; x.fillStyle = '#bdb9a3'; x.fillText(spaced((p.nome || '').toUpperCase()), W / 2, 340);
+  x.font = `150px ${STENF}`; x.fillStyle = '#9cc1ff'; x.fillText(dec(p.pct, 1) + '%', W / 2, 560); x.font = `800 48px ${CONDF}`; x.fillStyle = '#e6e2cf'; x.fillText('FLÁVIO BOLSONARO', W / 2, 625);
+  x.font = `150px ${STENF}`; x.fillStyle = '#ff9f90'; x.fillText(dec(100 - p.pct, 1) + '%', W / 2, 840); x.font = `800 48px ${CONDF}`; x.fillStyle = '#e6e2cf'; x.fillText('LULA', W / 2, 905);
+  const box = (y, k, v) => { x.fillStyle = 'rgba(18,21,15,.94)'; x.fillRect(90, y, W - 180, 170); x.fillStyle = '#e3a72f'; x.fillRect(90, y, W - 180, 6); x.font = `800 30px ${CONDF}`; x.fillStyle = '#f5c96a'; x.fillText(spaced(k), W / 2, y + 62); x.font = `62px ${STENF}`; x.fillStyle = '#e6e2cf'; x.fillText(v, W / 2, y + 138); };
+  box(1010, 'ELEITO DECLARADO ÀS', (p.hora || '?').replace(':', 'H'));
+  box(1230, 'ESTADO MAIS APERTADO', (UFN[p.uf] || '?').toUpperCase());
+  x.font = `34px ${TYPEF}`; x.fillStyle = '#d6d2bf'; x.fillText('E você? Faça o seu e mande para a turma.', W / 2, 1520);
+  x.font = `700 40px ${CONDF}`; x.fillStyle = '#e3a72f'; x.fillText(spaced('VOTOCRUZADO.COM.BR/BATALHA'), W / 2, 1800);
+  x.font = `600 24px ${CONDF}`; x.fillStyle = '#7a7d68'; x.fillText('Palpite de brincadeira · resultado oficial: TSE', W / 2, 1850);
+  c.toBlob(b => offerFile(b, 'meu-palpite-batalha.png', 'image'), 'image/png');
+}
+function bolBind() {
+  if (!$('#bolaoModal')) return;
+  $('#bPct').oninput = bolPctLabel;
+  $('#bSalvar').onclick = () => { BOL.me = bolCollect(); bolSave(); bolRender(); toast('Palpite salvo neste aparelho'); };
+  $('#bStory').onclick = () => { BOL.me = bolCollect(); bolSave(); bolRender(); $('#bolaoModal').hidden = true; bolCard(BOL.me); };
+  $('#bLink').onclick = async () => {
+    BOL.me = bolCollect(); bolSave(); bolRender(); const link = bolLink(BOL.me);
+    if (navigator.share && MOBILE) { try { await navigator.share({ title: 'Meu palpite na Batalha do voto', text: `Meu palpite para o 2º turno: Flávio ${dec(BOL.me.pct, 1)}% x ${dec(100 - BOL.me.pct, 1)}% Lula. Faça o seu:`, url: link }); return; } catch (e) {} }
+    try { await navigator.clipboard.writeText(link); toast('Link do palpite copiado. Mande no grupo da turma.'); } catch (e) { prompt('Copie o link do seu palpite:', link); }
+  };
+  $('#bFechar').onclick = () => { $('#bolaoModal').hidden = true; };
+  $('#bolaoModal').addEventListener('click', e => { if (e.target.id === 'bolaoModal') $('#bolaoModal').hidden = true; });
+  $('#btnBolao').onclick = bolOpen;
+}
+
+// ---------------------------------------------------------------------
 // Controles e início
 // ---------------------------------------------------------------------
 $$('#modes button').forEach(b => b.onclick = () => setMode(b.dataset.m, b.dataset.m !== 'live'));
@@ -1752,6 +1931,8 @@ $('#btnSom').onclick = sndToggle;
 $('#btnCam').onclick = () => { CAM.auto = !CAM.auto; $('#btnCam').textContent = 'Câmera: ' + (CAM.auto ? 'auto' : 'fixa'); if (!CAM.auto && !CAM.user) camHome(); };
 $('#btnImg').onclick = saveImage;
 $('#btnNar').onclick = narToggle;
+$('#btnAlr').onclick = alrToggle;
+bolLoad(); bolFromURL(); bolBind(); alrInit();
 $('#btnTV').onclick = () => tvToggle();
 $('#btnTVx').onclick = () => tvToggle(false);
 $('#btnStory').onclick = storyImage;
