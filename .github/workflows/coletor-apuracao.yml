@@ -12,10 +12,19 @@ on:
         default: '330'
         required: true
   schedule:
-    # 25/10, horário de Brasília: 16h30, 16h55 e 17h20 (reservas caso o GitHub atrase ou pule um disparo)
+    # Horários de Brasília. Cada execução no GitHub dura no máximo 6h, então a noite é coberta em rodadas.
+    # Disparos feitos enquanto uma rodada está rodando ficam na fila (concurrency abaixo) e assumem quando ela termina,
+    # continuando o histórico salvo no branch dados. Se a apuração já tiver terminado, a rodada sai sozinha.
+    # 1ª rodada, 25/10: 16h30 (reservas às 16h55 e 17h20, caso o GitHub atrase ou pule um disparo); vai até ~22h
     - cron: '30 19 25 10 *'
     - cron: '55 19 25 10 *'
     - cron: '20 20 25 10 *'
+    # 2ª rodada: disparos às 21h40 e 21h55 de 25/10; começa quando a 1ª termina (~22h) e vai até ~3h30
+    - cron: '40 0 26 10 *'
+    - cron: '55 0 26 10 *'
+    # 3ª rodada: disparos às 3h10 e 3h25 de 26/10; começa quando a 2ª termina e vai até a apuração fechar (no 1º turno, o AM fechou às 4h59)
+    - cron: '10 6 26 10 *'
+    - cron: '25 6 26 10 *'
 
 concurrency:
   group: coletor-apuracao
