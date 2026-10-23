@@ -19,8 +19,8 @@
 <script>window.__errs=[];window.addEventListener('error',function(e){window.__errs.push(e.message+' @'+(e.lineno||''));var b=document.getElementById('errbox');if(b){b.hidden=false;b.textContent='Erro no aplicativo: '+e.message;}});</script>
 <style>
 :root{--r:14px;--ease:cubic-bezier(.2,.8,.2,1)}
-[data-theme=dark]{--bg:#0a0e16;--bg2:#0f1520;--panel:#121a28;--panel2:#18223a;--line:#22304a;--line2:#2c3c5c;--ink:#e7ecf4;--ink2:#c7d0de;--mut:#8b98ad;--acc:#5eead4;--acc2:#38bdf8;--flavio:#4f8ff7;--lula:#f0605a;--tw:#a78bfa;--cury:#a78bfa;--renan:#c4b5fd;--caiado:#7c5bd6;--zema:#ddd6fe;--outros:#64748b;--branco:#475569;--nulo:#334155;--nl:#60a5fa;--le:#f87171;--jair:#93c5fd;--ok:#34d399;--warn:#fbbf24;--shadow:0 10px 30px rgba(0,0,0,.35);--glass:rgba(18,26,40,.72);--chip:#1a2438;--chipOn:#e7ecf4;--chipOnInk:#0a0e16;--nodata:#1f2737;--ufb:rgba(226,232,240,.55);--munb:rgba(10,14,22,.55);--hover:#ffffff;--sel:#5eead4}
-[data-theme=light]{--bg:#f3f5f9;--bg2:#eef1f6;--panel:#ffffff;--panel2:#f7f8fb;--line:#e3e7ef;--line2:#d5dbe6;--ink:#0f172a;--ink2:#334155;--mut:#64748b;--acc:#0f766e;--acc2:#0369a1;--flavio:#1f4e9c;--lula:#c0392b;--tw:#7a5bb0;--cury:#8e6bbf;--renan:#b49ad9;--caiado:#5f3f97;--zema:#cdbbe9;--outros:#b6bcc8;--branco:#d7dbe2;--nulo:#a9b0bc;--nl:#3d7cc9;--le:#d9604f;--jair:#6b9fdc;--ok:#059669;--warn:#b45309;--shadow:0 10px 30px rgba(15,23,42,.10);--glass:rgba(255,255,255,.78);--chip:#eef1f6;--chipOn:#0f172a;--chipOnInk:#ffffff;--nodata:#e5e7eb;--ufb:rgba(15,23,42,.55);--munb:rgba(255,255,255,.65);--hover:#0f172a;--sel:#0f766e}
+[data-theme=dark]{--bg:#0a0e16;--bg2:#0f1520;--panel:#121a28;--panel2:#18223a;--line:#22304a;--line2:#2c3c5c;--ink:#e7ecf4;--ink2:#c7d0de;--mut:#8b98ad;--acc:#5eead4;--acc2:#38bdf8;--flavio:#4f8ff7;--lula:#f0605a;--tw:#a78bfa;--cury:#f5b642;--renan:#2dd4bf;--caiado:#86d24a;--zema:#f472b6;--outros:#64748b;--branco:#475569;--nulo:#334155;--nl:#60a5fa;--le:#f87171;--jair:#93c5fd;--ok:#34d399;--warn:#fbbf24;--shadow:0 10px 30px rgba(0,0,0,.35);--glass:rgba(18,26,40,.72);--chip:#1a2438;--chipOn:#e7ecf4;--chipOnInk:#0a0e16;--nodata:#1f2737;--ufb:rgba(226,232,240,.55);--munb:rgba(10,14,22,.55);--hover:#ffffff;--sel:#5eead4}
+[data-theme=light]{--bg:#f3f5f9;--bg2:#eef1f6;--panel:#ffffff;--panel2:#f7f8fb;--line:#e3e7ef;--line2:#d5dbe6;--ink:#0f172a;--ink2:#334155;--mut:#64748b;--acc:#0f766e;--acc2:#0369a1;--flavio:#1f4e9c;--lula:#c0392b;--tw:#7a5bb0;--cury:#b7791f;--renan:#0d9488;--caiado:#4d7c0f;--zema:#c2417f;--outros:#b6bcc8;--branco:#d7dbe2;--nulo:#a9b0bc;--nl:#3d7cc9;--le:#d9604f;--jair:#6b9fdc;--ok:#059669;--warn:#b45309;--shadow:0 10px 30px rgba(15,23,42,.10);--glass:rgba(255,255,255,.78);--chip:#eef1f6;--chipOn:#0f172a;--chipOnInk:#ffffff;--nodata:#e5e7eb;--ufb:rgba(15,23,42,.55);--munb:rgba(255,255,255,.65);--hover:#0f172a;--sel:#0f766e}
 *{box-sizing:border-box}
 [hidden]{display:none !important}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
@@ -164,6 +164,23 @@ table.t tr.click:hover td{background:var(--panel2)}
 .rk .b{height:6px;border-radius:4px;margin-top:4px;width:0;transition:width .7s var(--ease)}
 .rk .val{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tv3list{display:grid;gap:2px;margin-top:4px}
+.tv3{display:grid;grid-template-columns:minmax(128px,176px) minmax(0,1fr) 124px;gap:3px 12px;align-items:center;padding:8px 8px 7px;border-radius:10px;cursor:pointer;transition:background .15s}
+.tv3:hover{background:var(--panel2)}
+.tv3 .nm3{font-weight:650;font-size:13.5px;line-height:1.2;min-width:0}
+.tv3 .nm3 small{display:block;font-weight:500;color:var(--mut);font-size:11.5px;margin:1px 0 0 16px}
+.tv3 .bk3{height:10px;border-radius:6px;background:var(--line);overflow:hidden}
+.tv3 .bk3 div{height:100%;width:0;border-radius:6px;transition:width .8s var(--ease)}
+.tv3 .v3{text-align:right;font-variant-numeric:tabular-nums;line-height:1.2}
+.tv3 .v3 b{font-size:15px}
+.tv3 .v3 small{display:block;color:var(--mut);font-size:11.5px;margin-top:1px}
+.tv3 .ex3{grid-column:1/-1;font-size:11.5px;color:var(--mut);padding-left:16px}
+.tv3foot{font-size:12.5px;color:var(--ink2);margin:10px 0 0;line-height:1.5}
+.tv3foot a{color:var(--acc);cursor:pointer;text-decoration:underline;text-underline-offset:2px;white-space:nowrap}
+.tvi{white-space:nowrap}
+.tvi i{display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:3px;vertical-align:0}
+#zT td:first-child,#ufT td:first-child{white-space:nowrap}
+@media(max-width:560px){.tv3{grid-template-columns:minmax(0,1fr) auto;gap:5px 10px}.tv3 .nm3{grid-column:1;grid-row:1}.tv3 .v3{grid-column:2;grid-row:1}.tv3 .bk3{grid-column:1/-1;grid-row:2}.tv3 .ex3{grid-row:3;padding-left:0}.tv3 .v3 b{font-size:14px}}
 @media(max-width:760px){.two{grid-template-columns:1fr}}
 .scatterWrap{position:relative}
 .scatterWrap canvas{width:100%;display:block;border-radius:12px;background:var(--panel2);border:1px solid var(--line);cursor:crosshair}
@@ -238,7 +255,8 @@ table.t tr.click:hover td{background:var(--panel2)}
     <div id="panels">
       <div class="panel" data-tab="geral">
         <div class="card"><h3>O que aconteceu aqui</h3><div class="story" id="story"></div></div>
-        <div class="card"><h3>Mesmos eleitores, escolhas diferentes</h3><p class="lead">Cada barra é 100% de quem foi votar (no Senado, cada eleitor tem 2 votos). Azul: Flávio e candidatos fora do campo de Lula. Vermelho: Lula e o campo dele. Roxo: terceira via. Cinza: branco e nulo.</p><div id="bars"></div><div class="legrow" id="barsLegend"></div></div>
+        <div class="card"><h3>Mesmos eleitores, escolhas diferentes</h3><p class="lead">Cada barra é 100% de quem foi votar (no Senado, cada eleitor tem 2 votos). Azul: Flávio e candidatos fora do campo de Lula. Vermelho: Lula e o campo dele. Entre os dois, os quatro candidatos da terceira via, cada um com sua cor. Cinza: nanicos, branco e nulo.</p><div id="bars"></div><div class="legrow" id="barsLegend"></div></div>
+        <div class="card" id="twCard"></div>
       </div>
       <div class="panel" data-tab="jair">
         <div class="card"><div class="row" style="justify-content:space-between"><div><h3>Trajetória: 2018, 2022 e 2026</h3><p class="lead" style="margin-bottom:6px">Candidato do campo bolsonarista (Jair em 2018 e 2022, Flávio em 2026) contra o candidato do PT (Haddad em 2018, Lula em 2022 e 2026).</p></div><div class="row"><div class="seg" id="segTurn"><button data-v="1" class="on">1º turno</button><button data-v="2">2º turno</button></div><div class="seg" id="segUnit"><button data-v="p" class="on">% válidos</button><button data-v="v">votos</button></div></div></div><div id="traj"></div><div class="legrow" id="trajLegend"></div></div>
@@ -254,7 +272,7 @@ table.t tr.click:hover td{background:var(--panel2)}
           <div class="presets" id="presets"></div>
           <div class="ctrls">
             <div class="ctrl"><label>Eleitores de Flávio que votaram em governador não-lulista: <span class="cv" id="vF"></span></label><input type="range" id="pF" min="80" max="100" step="1"></div>
-            <div class="ctrl"><label>Eleitores da terceira via que votaram em governador não-lulista: <span class="cv" id="vTW"></span></label><input type="range" id="pTW" min="20" max="100" step="1"></div>
+            <div class="ctrl"><label>Eleitores da terceira via (Cury, Renan, Caiado e Zema) que votaram em governador não-lulista: <span class="cv" id="vTW"></span></label><input type="range" id="pTW" min="20" max="100" step="1"></div>
             <div class="ctrl"><label>Quem votou branco/nulo para presidente e votou em governador não-lulista: <span class="cv" id="vBN"></span></label><input type="range" id="pBN" min="0" max="40" step="1"></div>
           </div>
           <div id="sankey"></div><div class="result" id="scenResult"></div></div>
@@ -402,12 +420,29 @@ const PAL = {
   blue: { light: ['#f2f6fb','#d6e3f3','#a9c4e6','#6f9bd3','#3d72bb','#1f4e9c','#122e5e'], dark: ['#26314a','#203a63','#244c82','#2b62a3','#3679c6','#5596e3','#94c4ff'] },
   red: { light: ['#fdf3f2','#f8d5d1','#efa79f','#e2786c','#cf4c3e','#b0281c','#741510'], dark: ['#3a2a33','#55282e','#76302f','#9a3833','#c0433c','#e15a50','#ff978a'] },
   div: { light: ['#7f1d1d','#b91c1c','#e57373','#f6c1bc','#c6dbef','#6baed6','#2b6cb0','#1e3a8a'], dark: ['#ff7a6e','#d84a45','#9c3433','#4a2426','#1e3350','#2c5b92','#4489dc','#8cc0ff'] },
+  amber: { light: ['#f6f4ef','#fcefd0','#f9dc9a','#f3c25e','#e3a032','#bd7b17','#83530a'], dark: ['#2b3446','#3d3a2d','#594a25','#7a5e1f','#a1771b','#cf9622','#ffcf5e'] },
+  teal: { light: ['#f0f6f6','#cfece8','#9cdbd2','#62c3b6','#2ea394','#147d70','#0b554c'], dark: ['#29344a','#203d47','#1e5250','#1d6b63','#1f8879','#28aa95','#72e8d6'] },
+  lime: { light: ['#f3f6ee','#e1efcd','#c4e29e','#9fcf66','#78b336','#578c1b','#3a610d'], dark: ['#2a3446','#2d3c34','#385230','#476c2d','#5a892b','#71ab2f','#ace56d'] },
+  pink: { light: ['#f8f1f5','#fadcea','#f5b8d4','#ec8ab6','#dc5c97','#ba3c78','#831f52'], dark: ['#2c3247','#3c2e45','#562f56','#763469','#99397c','#c54693','#ff92c8'] },
   gain: { light: ['#7c2d12','#c2410c','#fb923c','#fed7aa','#ccfbf1','#5eead4','#0d9488','#134e4a'], dark: ['#ff8a4c','#d9622b','#8a3c1c','#3d2419','#173a37','#1f6f66','#2bb3a3','#7af0de'] }
 };
+// terceira via, candidato por candidato
+const TW3 = [
+  { k: 'cury', nome: 'Augusto Cury', short: 'Cury', p: 'Avante' },
+  { k: 'renan', nome: 'Renan Santos', short: 'Renan', p: 'Missão' },
+  { k: 'caiado', nome: 'Ronaldo Caiado', short: 'Caiado', p: 'PSD' },
+  { k: 'zema', nome: 'Romeu Zema', short: 'Zema', p: 'Novo' }];
+// índice do mais votado entre os quatro (4 = empate; null = nenhum voto)
+function twLeader(b) { let bi = -1, bv = 0, tie = false; TW3.forEach((c, i) => { const v = b[c.k] || 0; if (v > bv) { bv = v; bi = i; tie = false; } else if (v === bv && v > 0) tie = true; }); return bi < 0 ? null : tie ? 4 : bi; }
 const METRICS = {
   cross: { label: 'Voto cruzado', long: 'Lula acima da esquerda para governador (% de quem votou)', get: b => pct(b.L - b.GLE, b.Cg), breaks: [0, 5, 10, 20, 30, 45], pal: 'orange', unit: '%', grp: '2026' },
   crossMin: { label: 'Mínimo garantido', long: 'Eleitores de Lula que certamente votaram em governador não-lulista (% dos eleitores de Lula)', get: b => pct(b.lb0, b.L), breaks: [1, 5, 10, 20, 40, 60], pal: 'brown', unit: '%', grp: '2026' },
-  tw: { label: 'Terceira via', long: 'Cury + Renan + Caiado + Zema (% dos válidos)', get: b => pct(b.TW, b.VVp), breaks: [3, 5, 7, 9, 11, 14], pal: 'purple', unit: '%', grp: '2026' },
+  tw: { label: 'Terceira via (soma)', chip: 'Soma dos quatro', long: 'Terceira via: Cury + Renan + Caiado + Zema (% dos válidos)', get: b => pct(b.TW, b.VVp), breaks: [3, 5, 7, 9, 11, 14], pal: 'purple', unit: '%', grp: '3via' },
+  cury: { label: 'Cury', long: 'Augusto Cury, Avante (% dos válidos)', get: b => pct(b.cury, b.VVp), breaks: [1, 1.5, 2, 3, 4, 6], pal: 'amber', unit: '%', grp: '3via' },
+  renan: { label: 'Renan', long: 'Renan Santos, Missão (% dos válidos)', get: b => pct(b.renan, b.VVp), breaks: [0.5, 1, 1.5, 2, 2.5, 3], pal: 'teal', unit: '%', grp: '3via' },
+  caiado: { label: 'Caiado', long: 'Ronaldo Caiado, PSD (% dos válidos)', get: b => pct(b.caiado, b.VVp), breaks: [0.5, 1, 2, 3, 5, 10], pal: 'lime', unit: '%', grp: '3via' },
+  zema: { label: 'Zema', long: 'Romeu Zema, Novo (% dos válidos)', get: b => pct(b.zema, b.VVp), breaks: [0.05, 0.1, 0.2, 0.4, 0.8, 1.5], pal: 'pink', unit: '%', grp: '3via', d: 2 },
+  lider3: { label: 'Quem liderou a terceira via', chip: 'Quem liderou', long: 'Mais votado entre Cury, Renan, Caiado e Zema em cada município (nº de municípios no país)', get: b => twLeader(b), cats: TW3.map(c => ({ l: c.short, col: () => CC[c.k] })).concat([{ l: 'Empate', col: () => CC.mut }]), grp: '3via' },
   gap: { label: 'Gov. não-lulista − Flávio', long: 'Governador não-lulista menos Flávio (pontos dos válidos)', get: b => pct(b.GNL, b.VVgN) - pct(b.F, b.VVp), breaks: [0, 5, 10, 20, 30, 45], pal: 'blue', unit: ' p.p.', grp: '2026' },
   margin: { label: 'Flávio − Lula', long: 'Flávio menos Lula para presidente (pontos dos válidos)', get: b => pct(b.F - b.L, b.VVp), breaks: [-40, -20, -10, 0, 10, 20, 40], pal: 'div', unit: ' p.p.', grp: '2026' },
   flavio: { label: 'Flávio', long: 'Flávio (% dos válidos)', get: b => pct(b.F, b.VVp), breaks: [20, 30, 40, 50, 60, 70], pal: 'blue', unit: '%', grp: '2026' },
@@ -422,9 +457,9 @@ const METRICS = {
 };
 let MAPMETRIC = 'cross';
 const palOf = M => PAL[M.pal][THEME];
-function colorFor(M, v) { if (!isNum(v)) return CC.nodata; let i = 0; while (i < M.breaks.length && v >= M.breaks[i]) i++; return palOf(M)[i]; }
-function classOf(M, v) { if (!isNum(v)) return -1; let i = 0; while (i < M.breaks.length && v >= M.breaks[i]) i++; return i; }
-const fmtMetric = (M, v) => !isNum(v) ? '–' : (M.unit === '%' ? fmtP(v) : fmtPP(v));
+function colorFor(M, v) { if (!isNum(v)) return CC.nodata; if (M.cats) return M.cats[v].col(); let i = 0; while (i < M.breaks.length && v >= M.breaks[i]) i++; return palOf(M)[i]; }
+function classOf(M, v) { if (!isNum(v)) return -1; if (M.cats) return v; let i = 0; while (i < M.breaks.length && v >= M.breaks[i]) i++; return i; }
+const fmtMetric = (M, v) => !isNum(v) ? '–' : M.cats ? M.cats[v].l : (M.unit === '%' ? fmtP(v, M.d || 1) : fmtPP(v));
 
 /* ================= mapa ================= */
 const KC = Math.cos(15 * Math.PI / 180);
@@ -460,7 +495,7 @@ function drawMap() {
   const c = mctx, M = METRICS[MAPMETRIC]; c.setTransform(DPR, 0, 0, DPR, 0, 0); c.clearRect(0, 0, MW, MH);
   c.setTransform(DPR * VIEW.s, 0, 0, DPR * VIEW.s, DPR * VIEW.tx, DPR * VIEW.ty);
   const x0 = -VIEW.tx / VIEW.s, x1 = (MW - VIEW.tx) / VIEW.s, y0 = -VIEW.ty / VIEW.s, y1 = (MH - VIEW.ty) / VIEW.s;
-  const pal = palOf(M);
+  const pal = M.cats ? M.cats.map(c => c.col()) : palOf(M);
   for (const f of FEATS) { const bb = f.bb; if (bb[1] < x0 || bb[0] > x1 || bb[3] < y0 || bb[2] > y1) continue; let a = inScope(f) ? 1 : .2; const v = f.m ? M.get(f.m.b) : null; if (LEGHL >= 0 && classOf(M, v) !== LEGHL) a *= .14; c.globalAlpha = a; c.fillStyle = isNum(v) ? pal[classOf(M, v)] : CC.nodata; c.fill(f.path, 'evenodd'); }
   c.globalAlpha = 1;
   if (VIEW.s > BR_S() * 2.4) { c.lineWidth = .6 / VIEW.s; c.strokeStyle = CC.munb; for (const f of FEATS) { const bb = f.bb; if (bb[1] < x0 || bb[0] > x1 || bb[3] < y0 || bb[2] > y1) continue; c.stroke(f.path); } }
@@ -483,8 +518,8 @@ function showTip(html, cx, cy) { tip.innerHTML = html; tip.hidden = false; const
 const hideTip = () => { tip.hidden = true; };
 function munTip(m) { const b = m.b, M = METRICS[MAPMETRIC], f = pct(b.F, b.VVp), l = pct(b.L, b.VVp), tw = pct(b.TW, b.VVp);
   let h = `<b>${esc(m.nm)}</b> <span style="color:var(--mut)">/ ${m.uf.toUpperCase()}${m.cap ? ' · capital' : ''}</span><br><span style="color:var(--mut)">${fmtN(b.TE)} eleitores</span>`;
-  h += `<div class="mini"><div style="width:${f}%;background:var(--flavio)"></div><div style="width:${tw}%;background:var(--tw)"></div><div style="width:${l}%;background:var(--lula)"></div></div>`;
-  h += `Flávio <b style="color:var(--flavio)">${fmtP(f)}</b> · Lula <b style="color:var(--lula)">${fmtP(l)}</b> · 3ª via ${fmtP(tw)}<br>Governador: não-lulista ${fmtP(pct(b.GNL, b.VVgN))} · esquerda ${fmtP(pct(b.GLE, b.VVgN))}`;
+  h += `<div class="mini"><div style="width:${f}%;background:var(--flavio)"></div>${TW3.map(c => `<div style="width:${pct(b[c.k], b.VVp)}%;background:var(--${c.k})"></div>`).join('')}<div style="width:${l}%;background:var(--lula)"></div></div>`;
+  h += `Flávio <b style="color:var(--flavio)">${fmtP(f)}</b> · Lula <b style="color:var(--lula)">${fmtP(l)}</b> · 3ª via ${fmtP(tw)}<br><span style="font-size:11.5px">${twInline(b)}</span><br>Governador: não-lulista ${fmtP(pct(b.GNL, b.VVgN))} · esquerda ${fmtP(pct(b.GLE, b.VVgN))}`;
   if (b.HN) h += `<br>Jair 2022: ${fmtP(pct(b.J22, b.VV22))} → Flávio ${fmtP(f)} <span class="delta ${f - pct(b.J22, b.VV22) >= 0 ? 'up' : 'dn'}">(${fmtPP(f - pct(b.J22, b.VV22))})</span>`;
   h += `<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--line)"><b>${M.label}: ${fmtMetric(M, M.get(b))}</b></div>`; return h; }
 const PTRS = new Map(); let pinch = null;
@@ -507,13 +542,20 @@ $('#zIn').onclick = () => zoomAt(MW / 2, MH / 2, 1.8, true);
 $('#zOut').onclick = () => zoomAt(MW / 2, MH / 2, 1 / 1.8, true);
 $('#zFit').onclick = () => animateTo(fitView(bboxOfScope(SCOPE)));
 function renderMetricBar() {
-  const grp = { '2026': [], 'Jair': [] }; Object.entries(METRICS).forEach(([k, M]) => grp[M.grp].push(k));
-  $('#metricBar').innerHTML = `<span class="grp">2026</span>` + grp['2026'].map(k => `<button class="chip ${k === MAPMETRIC ? 'on' : ''}" data-m="${k}" title="${esc(METRICS[k].long)}">${METRICS[k].label}</button>`).join('') + `<span class="grp">x Jair</span>` + grp['Jair'].map(k => `<button class="chip ${k === MAPMETRIC ? 'on' : ''}" data-m="${k}" title="${esc(METRICS[k].long)}">${METRICS[k].label}</button>`).join('');
-  $$('#metricBar .chip').forEach(b => b.onclick = () => { MAPMETRIC = b.dataset.m; renderMetricBar(); renderLegend(); drawMap(); if ($('#rankMetric')) { $('#rankMetric').value = MAPMETRIC; renderRank(); } });
+  const grp = { '2026': [], '3via': [], 'Jair': [] }; Object.entries(METRICS).forEach(([k, M]) => grp[M.grp].push(k));
+  const chips = ks => ks.map(k => `<button class="chip ${k === MAPMETRIC ? 'on' : ''}" data-m="${k}" title="${esc(METRICS[k].long)}">${METRICS[k].chip || METRICS[k].label}</button>`).join('');
+  $('#metricBar').innerHTML = `<span class="grp">2026</span>` + chips(grp['2026']) + `<span class="grp">3ª via</span>` + chips(grp['3via']) + `<span class="grp">x Jair</span>` + chips(grp['Jair']);
+  $$('#metricBar .chip').forEach(b => b.onclick = () => setMapMetric(b.dataset.m));
+}
+function setMapMetric(k, fromPanel) {
+  MAPMETRIC = k; renderMetricBar(); renderLegend(); drawMap();
+  if ($('#rankMetric') && !METRICS[k].cats) { $('#rankMetric').value = k; renderRank(); }
+  if (fromPanel) { toast('Mapa: ' + METRICS[k].long.replace(/ \(.*\)$/, '')); if (window.innerWidth <= 1100) $('#mapPane').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 }
 function renderLegend() {
-  const M = METRICS[MAPMETRIC], pal = palOf(M), b = M.breaks, u = M.unit === '%' ? '%' : '';
-  const labs = pal.map((c, i) => { const lo = i === 0 ? null : b[i - 1], hi = i < b.length ? b[i] : null; return lo === null ? '< ' + hi + u : hi === null ? '≥ ' + lo + u : lo + '–' + hi + u; });
+  const M = METRICS[MAPMETRIC]; let pal, labs;
+  if (M.cats) { const n = twLeadCounts(MUN); pal = M.cats.map(c => c.col()); labs = M.cats.map((c, i) => c.l + ' ' + fmtN(n[i])); }
+  else { const b = M.breaks, u = M.unit === '%' ? '%' : '', fb = x => String(x).replace('.', ','); pal = palOf(M); labs = pal.map((c, i) => { const lo = i === 0 ? null : b[i - 1], hi = i < b.length ? b[i] : null; return lo === null ? '< ' + fb(hi) + u : hi === null ? '≥ ' + fb(lo) + u : fb(lo) + '–' + fb(hi) + u; }); }
   $('#legend').innerHTML = `<div class="ttl2"><span>${esc(M.long)}</span><span class="rstat">${COARSE ? 'toque na escala para destacar' : 'passe o mouse na escala para destacar'}</span></div><div class="legbar">${pal.map((c, i) => `<div data-i="${i}" style="background:${c}" title="${labs[i]}"></div>`).join('')}</div><div class="leglab">${labs.map(l => `<span>${l}</span>`).join('')}</div>`;
   $$('#legend .legbar div').forEach(d => { if (COARSE) { d.onclick = () => { const i = +d.dataset.i; LEGHL = LEGHL === i ? -1 : i; drawMap(); }; return; } d.onmouseenter = () => { LEGHL = +d.dataset.i; drawMap(); }; d.onmouseleave = () => { LEGHL = -1; drawMap(); }; });
 }
@@ -538,7 +580,42 @@ function candSegs(list, votes, base, br, nu) {
   let segs = nl.slice(); if (small.NL) segs.push({ label: 'Outros não-lulistas', v: small.NL, c: NLS[4], dk: 1 }); segs = segs.concat(le); if (small.LE) segs.push({ label: 'Outros de esquerda', v: small.LE, c: LES[4], dk: 1 });
   segs.push({ label: 'Branco', v: br, c: CC.branco, dk: THEME !== 'dark' }, { label: 'Nulo', v: nu, c: CC.nulo, dk: THEME !== 'dark' }); return segs;
 }
-function presSegs(b) { const dk = THEME !== 'dark'; return [{ label: 'Flávio', v: b.F, c: CC.flavio }, { label: 'Cury', v: b.cury, c: CC.cury }, { label: 'Renan', v: b.renan, c: CC.renan, dk: 1 }, { label: 'Caiado', v: b.caiado, c: CC.caiado }, { label: 'Zema', v: b.zema, c: CC.zema, dk: 1 }, { label: 'Lula', v: b.L, c: CC.lula }, { label: 'Outros', v: b.O, c: CC.outros, dk }, { label: 'Branco', v: b.BR, c: CC.branco, dk }, { label: 'Nulo', v: b.NU, c: CC.nulo, dk }]; }
+function presSegs(b) { const dk = THEME !== 'dark', dt = THEME === 'dark'; return [{ label: 'Flávio', v: b.F, c: CC.flavio }].concat(TW3.map(c => ({ label: c.nome + ' (' + c.p + ')', short: c.short, v: b[c.k], c: CC[c.k], dk: dt })), [{ label: 'Lula', v: b.L, c: CC.lula }, { label: 'Outros candidatos (nanicos)', short: 'Outros', v: b.O, c: CC.outros, dk }, { label: 'Branco', v: b.BR, c: CC.branco, dk }, { label: 'Nulo', v: b.NU, c: CC.nulo, dk }]); }
+// textos da terceira via (do mais votado para o menos votado no caso aberto)
+const twSorted = b => TW3.slice().sort((x, y) => (b[y.k] || 0) - (b[x.k] || 0));
+const twPct = (b, k) => { const p = pct(b[k], b.VVp); return fmtP(p, isNum(p) && p > 0 && p < 0.95 ? 2 : 1); };
+const twInline = b => twSorted(b).map((c, i, a) => `<span class="tvi"><i style="background:var(--${c.k})"></i>${c.short} ${twPct(b, c.k)}${i < a.length - 1 ? ' ·' : ''}</span>`).join(' ');
+const twText = b => { const a = twSorted(b).map(c => c.short + ' ' + twPct(b, c.k)); return a.slice(0, -1).join(', ') + ' e ' + a[a.length - 1]; };
+function twLeadCounts(muns) { const n = [0, 0, 0, 0, 0]; muns.forEach(m => { const x = twLeader(m.b); if (isNum(x)) n[x]++; }); return n; }
+function twBest(s, k) {
+  let arr, lab;
+  if (s.type === 'br' || s.type === 'reg') { lab = 'melhor estado'; arr = ufsOf(s).map(u => ({ nm: DATA.ufs[u].nome, v: pct(UFAGG[u][k], UFAGG[u].VVp) })); }
+  else if (s.type === 'uf') { const ms = UFMUN[s.uf], big = ms.filter(m => m.b.TE >= 10000); lab = big.length ? 'melhor cidade (10 mil+ eleitores)' : 'melhor cidade'; arr = (big.length ? big : ms).map(m => ({ nm: m.nm, v: pct(m.b[k], m.b.VVp) })); }
+  else { const m = byId[s.id]; if (!m.z) return null; lab = 'melhor zona'; arr = m.z.map(z => { const zb = blocs(m.uf, z); return { nm: z.z + (z.nm ? ' · ' + z.nm : ''), v: pct(zb[k], zb.VVp) }; }); }
+  arr = arr.filter(x => isNum(x.v)).sort((a, c) => c.v - a.v); return arr[0] ? { lab, nm: arr[0].nm, v: arr[0].v } : null;
+}
+function renderTwCard(s, b) {
+  const el = $('#twCard'); if (!el) return;
+  const where = s.type === 'br' ? 'no Brasil (sem o exterior)' : s.type === 'reg' ? 'na região ' + s.reg : s.type === 'uf' ? emUF(s.uf) : ({ 'Rio de Janeiro': 'no ', 'Recife': 'no ' }[byId[s.id].nm] || 'em ') + byId[s.id].nm;
+  const rows = twSorted(b).map(c => ({ c, v: b[c.k] || 0, p: pct(b[c.k] || 0, b.VVp), sh: pct(b[c.k] || 0, b.TW) }));
+  const mx = Math.max(...rows.map(r => r.p || 0), 1e-9), uf = scopeUF(s);
+  const ref = k => { const out = []; if (s.type === 'mun') out.push(uf.toUpperCase() + ' ' + twPct(UFAGG[uf], k)); if (s.type !== 'br') out.push('Brasil ' + twPct(BRAGG, k)); return out; };
+  const list = rows.map(r => { const bst = twBest(s, r.c.k), ex = [isNum(r.sh) ? fmtP(r.sh, r.sh < 1 ? 1 : 0) + ' da terceira via' : null].concat(ref(r.c.k), bst ? [bst.lab + ': ' + esc(bst.nm) + ' (' + fmtP(bst.v, bst.v < 0.95 ? 2 : 1) + ')'] : []).filter(Boolean).join(' · ');
+    return `<div class="tv3" data-k="${r.c.k}" title="Ver ${r.c.short} no mapa"><div class="nm3"><span class="sw" style="background:${CC[r.c.k]}"></span>${r.c.nome}<small>${r.c.p}</small></div><div class="bk3"><div data-w="${(100 * (r.p || 0) / mx).toFixed(1)}" style="background:${CC[r.c.k]}"></div></div><div class="v3"><b>${twPct(b, r.c.k)}</b><small>${fmtN(r.v)} votos</small></div><div class="ex3">${ex}</div></div>`; }).join('');
+  let foot = '', link = '';
+  if (s.type === 'mun') { const L = twLeader(b), top2 = twSorted(b); const m = byId[s.id];
+    if (L === 4) { const tied = top2.filter(c => b[c.k] === b[top2[0].k]); foot = `Aqui, ${tied.map(c => c.short).join(' e ')} empataram como os mais votados da terceira via, com ${fmtN(b[top2[0].k])} votos cada.`; }
+    else if (isNum(L)) foot = `Aqui, o mais votado da terceira via foi ${TW3[L].short}, com ${fmtN(b[TW3[L].k])} votos${b[top2[1].k] > 0 ? ` (${fmtN(b[TW3[L].k] - b[top2[1].k])} a mais que ${top2[1].short})` : ''}.`;
+    if (m.z) { const n = [0, 0, 0, 0, 0]; m.z.forEach(z => { const x = twLeader(blocs(m.uf, z)); if (isNum(x)) n[x]++; }); const o = [0, 1, 2, 3].filter(i => n[i]).sort((a, c) => n[c] - n[a]), zp = o.map((i, j) => TW3[i].short + (j === 0 ? ' liderou em ' : ' em ') + n[i]); foot += ` Nas ${m.z.length} zonas eleitorais da cidade, ${zp.length > 1 ? zp.slice(0, -1).join(', ') + ' e ' + zp[zp.length - 1] : zp.join('')}${n[4] ? ` (empate em ${n[4]})` : ''}.`; } }
+  else { const ms = munsOf(s), n = twLeadCounts(ms), o = [0, 1, 2, 3].filter(i => n[i]).sort((a, c) => n[c] - n[a]);
+    const parts = o.map((i, j) => TW3[i].short + ' em ' + fmtN(n[i]) + (j === 0 ? (n[i] === 1 ? ' município' : ' municípios') : ''));
+    foot = `Mais votado da terceira via em cada município${s.type === 'br' ? '' : ' ' + (s.type === 'uf' ? deUF(s.uf) : 'da região')}: ${parts.length > 1 ? parts.slice(0, -1).join(', ') + ' e ' + parts[parts.length - 1] : parts.join('')}${n[4] ? ` (empate em ${fmtN(n[4])})` : ''}.`; link = ' <a data-m="lider3">Ver quem liderou no mapa</a>'; }
+  el.innerHTML = `<h3>Terceira via, candidato por candidato</h3><p class="lead">Votos para presidente no 1º turno, em % dos votos válidos ${where}. Juntos, os quatro tiveram <b>${fmtP(pct(b.TW, b.VVp))}</b> (${fmtQty(b.TW, 'votos')}). Toque ou clique num nome para ver o candidato no mapa.</p><div id="twComp"></div><div class="tv3list">${list}</div><p class="tv3foot">${foot} Os demais candidatos a presidente (nanicos) somaram ${fmtP(pct(b.O, b.VVp))} dos válidos.${link}</p>`;
+  stackBars($('#twComp'), [{ label: 'Divisão da terceira via', sub: '100% = votos dos quatro', base: b.TW, baseLabel: 'dos votos da terceira via', segs: TW3.map(c => ({ label: c.nome + ' (' + c.p + ')', short: c.short, v: b[c.k] || 0, c: CC[c.k], dk: THEME === 'dark' })) }]);
+  $$('#twCard .tv3').forEach(r => r.onclick = () => setMapMetric(r.dataset.k, true));
+  $$('#twCard a[data-m]').forEach(a => a.onclick = () => setMapMetric(a.dataset.m, true));
+  requestAnimationFrame(() => requestAnimationFrame(() => $$('#twCard .bk3 div').forEach(d => d.style.width = d.dataset.w + '%')));
+}
 function barsRows(s) {
   const b = caseB(s), uf = scopeUF(s), rows = [{ label: 'Presidente 2026', sub: fmtN(b.Cp) + ' votaram', base: b.Cp, baseLabel: 'de quem votou', segs: presSegs(b) }];
   if (s.type === 'mun') { const m = byId[s.id], U = DATA.ufs[m.uf], ng = U.gov.length, ns = U.sen.length; rows.push({ label: 'Governador 2026', base: b.Cg, baseLabel: 'de quem votou', segs: candSegs(U.gov, m.g, b.Cg, m.g[ng], m.g[ng + 1]) }); rows.push({ label: 'Senado 2026', sub: '2 votos por eleitor', base: b.VVsN + b.BNs, baseLabel: 'dos votos para senador', segs: candSegs(U.sen, m.s, b.VVsN + b.BNs, m.s[ns], m.s[ns + 1]) }); }
@@ -549,14 +626,14 @@ function barsRows(s) {
 function legendRow(el, items) { el.innerHTML = items.map(([l, c]) => `<span><span class="sw" style="background:${c}"></span>${l}</span>`).join(''); }
 const wrapLabel = (s, max) => { const w = s.split(' '), lines = []; let cur = ''; w.forEach(x => { if ((cur + ' ' + x).trim().length > max && cur) { lines.push(cur); cur = x; } else cur = (cur + ' ' + x).trim(); }); if (cur) lines.push(cur); return lines; };
 function waterfallSVG(b) {
-  const steps = [{ label: 'Votos de Flávio', v: b.F, abs: 1, c: CC.flavio }, { label: 'Lula teve a mais que a esquerda para governador', v: b.L - b.GLE, c: '#f97316' }, { label: 'Votos nos outros candidatos a presidente', v: b.TW + b.O, c: CC.tw }, { label: 'Branco/nulo: presidente menos governador', v: b.BNp - b.BNg, c: '#94a3b8' }, { label: 'Eleitores em trânsito (só presidente)', v: b.Cg - b.Cp, c: '#64748b' }, { label: 'Votos dos não-lulistas para governador', v: b.GNL, abs: 1, c: CC.nl }];
+  const steps = [{ label: 'Votos de Flávio', v: b.F, abs: 1, c: CC.flavio }, { label: 'Lula teve a mais que a esquerda para governador', v: b.L - b.GLE, c: '#f97316' }, { label: 'Votos nos outros candidatos a presidente', v: b.TW + b.O, c: CC.tw, tip: TW3.map(c => c.short + ' ' + fmtBig(b[c.k])).concat(['nanicos ' + fmtBig(b.O)]).join(' · ') }, { label: 'Branco/nulo: presidente menos governador', v: b.BNp - b.BNg, c: '#94a3b8' }, { label: 'Eleitores em trânsito (só presidente)', v: b.Cg - b.Cp, c: '#64748b' }, { label: 'Votos dos não-lulistas para governador', v: b.GNL, abs: 1, c: CC.nl }];
   let cum = 0; const bars = steps.map(st => { if (st.abs) { cum = st.v; return { st, y0: 0, y1: st.v }; } const y0 = cum; cum += st.v; return { st, y0, y1: cum }; });
   let maxV = 0, minV = 0; bars.forEach(x => { maxV = Math.max(maxV, x.y0, x.y1); minV = Math.min(minV, x.y0, x.y1); }); maxV *= 1.12;
   const NR = isNarrow(), cmp = v => { const a = Math.abs(v), sg = v < 0 ? '−' : '+'; return (a >= 1e6 ? dec1(a / 1e6) + ' mi' : a >= 1e3 ? Math.round(a / 1e3) + ' mil' : fmtN(a)); };
   const W = NR ? 360 : 680, H = NR ? 250 : 320, top = 26, bottom = NR ? 30 : 80, n = bars.length, step = W / n, bw = step * (NR ? .62 : .56), yS = v => top + (H - top - bottom) * (1 - (v - minV) / (maxV - minV));
   let s = `<svg class="wf" viewBox="0 0 ${W} ${H}" width="100%"><line x1="0" x2="${W}" y1="${yS(0)}" y2="${yS(0)}" stroke="${CC.line2}"/>`;
   bars.forEach((x, i) => { const cx = step * i + step / 2, y1 = yS(Math.max(x.y0, x.y1)), y2 = yS(Math.min(x.y0, x.y1)), h = Math.max(2, y2 - y1);
-    s += `<rect class="bar" style="animation-delay:${i * 90}ms" x="${(cx - bw / 2).toFixed(1)}" y="${y1.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="5" fill="${x.st.c}" data-tip="<b>${esc(x.st.label)}</b><br>${x.st.abs ? fmtN(x.st.v) : (x.st.v >= 0 ? '+' : '−') + fmtN(Math.abs(x.st.v))} votos"/>`;
+    s += `<rect class="bar" style="animation-delay:${i * 90}ms" x="${(cx - bw / 2).toFixed(1)}" y="${y1.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="5" fill="${x.st.c}" data-tip="<b>${esc(x.st.label)}</b><br>${x.st.abs ? fmtN(x.st.v) : (x.st.v >= 0 ? '+' : '−') + fmtN(Math.abs(x.st.v))} votos${x.st.tip ? '<br>' + esc(x.st.tip) : ''}"/>`;
     s += `<text class="strong" x="${cx.toFixed(1)}" y="${(y1 - 7).toFixed(1)}" font-size="${NR ? 11 : 12}" text-anchor="middle">${esc(NR ? (x.st.abs ? '' : (x.st.v < 0 ? '−' : '+')) + cmp(x.st.v) : (x.st.abs ? fmtBig(x.st.v) : fmtSigned(x.st.v)))}</text>`;
     if (i < n - 1) { const nx = step * (i + 1) + step / 2; s += `<line x1="${(cx + bw / 2).toFixed(1)}" x2="${(nx - bw / 2).toFixed(1)}" y1="${yS(x.y1).toFixed(1)}" y2="${yS(x.y1).toFixed(1)}" stroke="${CC.mut}" stroke-dasharray="3,3"/>`; }
     if (NR) s += `<text class="strong" x="${cx.toFixed(1)}" y="${H - bottom + 20}" font-size="12" text-anchor="middle">${i + 1}</text>`;
@@ -569,7 +646,7 @@ function isNarrow() { return (window.innerWidth || 1000) < 560; }
 function dec1(v) { return v.toFixed(1).replace('.', ','); }
 function spreadLabels(ys, gap, lo, hi) { const o = ys.slice(); for (let i = 1; i < o.length; i++) if (o[i] < o[i - 1] + gap) o[i] = o[i - 1] + gap; if (o.length && o[o.length - 1] > hi) { o[o.length - 1] = hi; for (let j = o.length - 2; j >= 0; j--) if (o[j] > o[j + 1] - gap) o[j] = o[j + 1] - gap; } if (o.length && o[0] < lo) { const d = lo - o[0]; for (let i = 0; i < o.length; i++) o[i] += d; } return o; }
 function sankeySVG(sc) {
-  const Ln = [{ k: 'F', label: 'Flávio', c: CC.flavio }, { k: 'TW', label: 'Terceira via', c: CC.tw }, { k: 'L', label: 'Lula', c: CC.lula }, { k: 'O', label: 'Outros', c: CC.outros }, { k: 'BN', label: 'Branco/nulo', c: CC.nulo }];
+  const Ln = [{ k: 'F', label: 'Flávio', c: CC.flavio }, { k: 'TW', label: 'Terceira via', c: CC.tw, tip: (bb => '<b>Terceira via</b><br>' + twSorted(bb).map(c => c.short + ' ' + fmtP(pct(bb[c.k], bb.TW), 0)).join(' · ') + ' dos votos dela')(caseB(SCOPE)) }, { k: 'L', label: 'Lula', c: CC.lula }, { k: 'O', label: 'Outros', c: CC.outros }, { k: 'BN', label: 'Branco/nulo', c: CC.nulo }];
   const NR = isNarrow();
   const Rn = [{ label: NR ? 'Gov. não-lulista' : 'Governador não-lulista', c: CC.nl }, { label: NR ? 'Gov. esquerda' : 'Governador de esquerda', c: CC.le }, { label: 'Branco/nulo', c: CC.nulo }];
   const rowT = Ln.map(n => sc.flows[n.k].reduce((a, x) => a + x, 0)), tot = rowT.reduce((a, x) => a + x, 0), colT = [0, 1, 2].map(j => Ln.reduce((a, n) => a + sc.flows[n.k][j], 0));
@@ -582,7 +659,7 @@ function sankeySVG(sc) {
     const d = `M${xL + nw},${y0.toFixed(2)} C${xm},${y0.toFixed(2)} ${xm},${y1.toFixed(2)} ${xR},${y1.toFixed(2)} L${xR},${(y1 + h).toFixed(2)} C${xm},${(y1 + h).toFixed(2)} ${xm},${(y0 + h).toFixed(2)} ${xL + nw},${(y0 + h).toFixed(2)} Z`;
     s += `<path class="lk s-${n.k} t-${j}" style="animation-delay:${(i * 3 + j) * 40}ms" d="${d}" fill="${n.c}" fill-opacity="${hl ? .82 : .24}" data-tip="<b>${esc(n.label)} → ${esc(Rn[j].label)}</b><br>${fmtN(v)} eleitores (estimativa)"/>`; off += h; rOff[j] += h; }); });
   const lys = spreadLabels(Ln.map((n, i) => LY[i] + rowT[i] * scl / 2), 30, top + 8, H - bot - 14), rys = spreadLabels(Rn.map((n, j) => RY[j] + colT[j] * scl / 2), 30, top + 8, H - bot - 14);
-  Ln.forEach((n, i) => { const h = rowT[i] * scl; s += `<rect class="nd" data-s="${n.k}" x="${xL}" y="${LY[i].toFixed(1)}" width="${nw}" height="${Math.max(1.5, h).toFixed(1)}" rx="3" fill="${n.c}"/><text class="strong" x="${xL - 7}" y="${(lys[i] - 1).toFixed(1)}" font-size="${fN}" text-anchor="end">${esc(n.label)}</text><text class="muted" x="${xL - 7}" y="${(lys[i] + 13).toFixed(1)}" font-size="${fV}" text-anchor="end">${fmtBig(rowT[i])}</text>`; });
+  Ln.forEach((n, i) => { const h = rowT[i] * scl; s += `<rect class="nd" data-s="${n.k}"${n.tip ? ` data-tip="${n.tip}"` : ''} x="${xL}" y="${LY[i].toFixed(1)}" width="${nw}" height="${Math.max(1.5, h).toFixed(1)}" rx="3" fill="${n.c}"/><text class="strong" x="${xL - 7}" y="${(lys[i] - 1).toFixed(1)}" font-size="${fN}" text-anchor="end">${esc(n.label)}</text><text class="muted" x="${xL - 7}" y="${(lys[i] + 13).toFixed(1)}" font-size="${fV}" text-anchor="end">${fmtBig(rowT[i])}</text>`; });
   Rn.forEach((n, j) => { const h = colT[j] * scl; s += `<rect class="nd" data-t="${j}" x="${xR}" y="${RY[j].toFixed(1)}" width="${nw}" height="${Math.max(1.5, h).toFixed(1)}" rx="3" fill="${n.c}"/><text class="strong" x="${xR + nw + 7}" y="${(rys[j] - 1).toFixed(1)}" font-size="${fN}">${esc(n.label)}</text><text class="muted" x="${xR + nw + 7}" y="${(rys[j] + 13).toFixed(1)}" font-size="${fV}">${fmtBig(colT[j])}</text>`; });
   const cap = 'Esquerda: voto para presidente. Direita: voto para governador. Faixas fortes: votos dos não-lulistas que não vieram de Flávio.';
   if (NR) return s + `</svg><p class="skcap">${cap}</p>`;
@@ -655,7 +732,7 @@ function govElected(uf) { const U = DATA.ufs[uf]; return { el: U.gov.filter(c =>
 function storyHTML(s, b, sc) {
   const out = [], gap = b.GNL - b.F, sob = b.L - b.GLE, CITY_ART = { 'Rio de Janeiro': 'No', 'Recife': 'No' };
   const where = s.type === 'br' ? 'No Brasil (sem os votos do exterior)' : s.type === 'reg' ? 'Na região ' + s.reg : s.type === 'uf' ? cap1(emUF(s.uf)) : (CITY_ART[byId[s.id].nm] || 'Em') + ' ' + byId[s.id].nm;
-  out.push(`<p>${where}, ${fmtQty(b.Cg, 'pessoas')} votaram (${fmtP(pct(b.Cg, b.TE))} do eleitorado). Para presidente, <b>Flávio teve ${fmtP(pct(b.F, b.VVp))}</b> dos válidos e <b>Lula ${fmtP(pct(b.L, b.VVp))}</b>; a terceira via somou ${fmtP(pct(b.TW, b.VVp))}.</p>`);
+  out.push(`<p>${where}, ${fmtQty(b.Cg, 'pessoas')} votaram (${fmtP(pct(b.Cg, b.TE))} do eleitorado). Para presidente, <b>Flávio teve ${fmtP(pct(b.F, b.VVp))}</b> dos válidos e <b>Lula ${fmtP(pct(b.L, b.VVp))}</b>; a terceira via somou ${fmtP(pct(b.TW, b.VVp))} (${twText(b)}).</p>`);
   let g = `Para governador, os candidatos fora do campo de Lula somaram <b>${fmtP(pct(b.GNL, b.VVgN))}</b> e o campo de Lula e a esquerda, <b>${fmtP(pct(b.GLE, b.VVgN))}</b>`;
   if (s.type === 'uf' || s.type === 'mun') { const nl = topCands(s, 'NL'), le = topCands(s, 'LE'), parts = []; if (nl[0]) parts.push(`o não-lulista mais votado${s.type === 'mun' ? ' aqui' : ''} foi ${tc(nl[0].c.n)} (${nl[0].c.p}), com ${fmtP(pct(nl[0].v, b.VVgN))}`); if (le[0]) parts.push(`do lado de Lula, ${tc(le[0].c.n)} (${le[0].c.p}), com ${fmtP(pct(le[0].v, b.VVgN))}`); if (parts.length) g += ': ' + parts.join('; '); }
   out.push(`<p>${g}.</p>`);
@@ -684,7 +761,7 @@ function renderHeader(s, b, sc) {
   el.innerHTML = `<div class="chTop"><div><h1>${esc(scopeName(s))}</h1><div class="chSub">${sub}</div><div class="badges">${badges}</div></div><div class="row">${pinBtn}</div></div>
   <div class="kpis">
     <div class="kpi"><div class="t">Eleitores</div><div class="v" id="k1"></div><div class="s">votaram ${fmtP(pct(b.Cg, b.TE))}</div></div>
-    <div class="kpi"><div class="t">Presidente 2026: Flávio x Lula</div><div class="v"><span style="color:var(--flavio)" id="k2a"></span> <span style="color:var(--mut);font-size:15px">x</span> <span style="color:var(--lula)" id="k2b"></span></div><div class="bar"><div style="width:${f}%;background:var(--flavio)"></div><div style="width:${tw}%;background:var(--tw)"></div><div style="width:${l}%;background:var(--lula)"></div></div><div class="s">terceira via ${fmtP(tw)}</div></div>
+    <div class="kpi"><div class="t">Presidente 2026: Flávio x Lula</div><div class="v"><span style="color:var(--flavio)" id="k2a"></span> <span style="color:var(--mut);font-size:15px">x</span> <span style="color:var(--lula)" id="k2b"></span></div><div class="bar"><div style="width:${f}%;background:var(--flavio)"></div>${TW3.map(c => `<div style="width:${pct(b[c.k], b.VVp)}%;background:var(--${c.k})"></div>`).join('')}<div style="width:${l}%;background:var(--lula)"></div></div><div class="s">3ª via ${fmtP(tw)}: ${twInline(b)}</div></div>
     <div class="kpi"><div class="t">Governador: não-lulista x esquerda</div><div class="v"><span style="color:var(--nl)" id="k3a"></span> <span style="color:var(--mut);font-size:15px">x</span> <span style="color:var(--le)" id="k3b"></span></div><div class="bar"><div style="width:${gn}%;background:var(--nl)"></div><div style="width:${ge}%;background:var(--le)"></div></div><div class="s">${fmtSignedQty(b.GNL - b.F, 'votos')} em relação a Flávio</div></div>
     <div class="kpi"><div class="t">Flávio x Jair (1º turno 2022)</div><div class="v" id="k4"></div><div class="s">${b.HN ? 'Jair ' + fmtP(pct(b.J22, b.VV22)) + ' → Flávio ' + fmtP(pct(b.Fh, b.VVph)) + ' · ' + fmtSignedQty(b.Fh - b.J22, 'votos') : 'sem dado de 2022'}</div></div>
     <div class="kpi"><div class="t">Eleitores de Lula em gov. não-lulista</div><div class="v" id="k5"></div><div class="s">mínimo certo ${fmtBig(b.lb0)} · ${fmtP(pct(sc.LtoNL, Lv), 0)} dos eleitores de Lula</div></div>
@@ -708,9 +785,9 @@ function renderTabs() {
 function setTab(t) { TAB = t; renderTabs(); renderTab(); updateHash(); }
 function renderTab() {
   const s = SCOPE, b = caseB(s), sc = scenScope(s);
-  if (TAB === 'geral') { $('#story').innerHTML = storyHTML(s, b, sc); stackBars($('#bars'), barsRows(s)); legendRow($('#barsLegend'), [['Flávio', CC.flavio], ['Terceira via', CC.tw], ['Lula', CC.lula], ['Não-lulistas (gov./Senado)', CC.nl], ['Campo de Lula e esquerda', CC.le], ['Branco', CC.branco], ['Nulo', CC.nulo]]); }
+  if (TAB === 'geral') { $('#story').innerHTML = storyHTML(s, b, sc); stackBars($('#bars'), barsRows(s)); legendRow($('#barsLegend'), [['Flávio', CC.flavio]].concat(TW3.map(c => [c.short, CC[c.k]]), [['Lula', CC.lula], ['Não-lulistas (gov./Senado)', CC.nl], ['Campo de Lula e esquerda', CC.le], ['Nanicos', CC.outros], ['Branco', CC.branco], ['Nulo', CC.nulo]])); renderTwCard(s, b); }
   if (TAB === 'jair') renderJair(s, b);
-  if (TAB === 'conta') { $('#waterfall').innerHTML = waterfallSVG(b); $('#waterfallNote').innerHTML = `Leitura: comece nos votos de Flávio, some e subtraia cada barra e você chega exatamente aos votos dos não-lulistas para governador (${fmtSigned(b.GNL - b.F)} em relação a Flávio). A barra laranja mostra quantos votos de Lula "sobraram" sem ir para a esquerda na disputa estadual. A roxa, os votos em outros presidenciáveis. A cinza costuma ser negativa porque muita gente anula ou vota em branco para governador.`; }
+  if (TAB === 'conta') { $('#waterfall').innerHTML = waterfallSVG(b); $('#waterfallNote').innerHTML = `Leitura: comece nos votos de Flávio, some e subtraia cada barra e você chega exatamente aos votos dos não-lulistas para governador (${fmtSigned(b.GNL - b.F)} em relação a Flávio). A barra laranja mostra quantos votos de Lula "sobraram" sem ir para a esquerda na disputa estadual. A roxa, os votos em outros presidenciáveis: ${twSorted(b).map(c => c.short + ' ' + fmtBig(b[c.k])).join(', ')} e nanicos ${fmtBig(b.O)}. A cinza costuma ser negativa porque muita gente anula ou vota em branco para governador.`; }
   if (TAB === 'fluxos') renderScen(s, b, sc);
   if (TAB === 'disp') renderFree();
   if (TAB === 'rank') renderRank();
@@ -725,8 +802,8 @@ function renderJair(s, b) {
     const dk = THEME !== 'dark', rows = [
       { label: '2018 · 1º turno', sub: fmtN(b.C18) + ' votaram', base: b.C18, baseLabel: 'de quem votou', segs: [{ label: 'Jair', v: b.B18, c: CC.flavio }, { label: 'Ciro, Alckmin e outros', short: 'Outros', v: b.CI18 + b.AL18 + b.O18, c: CC.tw }, { label: 'Haddad', v: b.H18, c: CC.lula }, { label: 'Branco', v: b.BR18, c: CC.branco, dk }, { label: 'Nulo', v: b.NU18, c: CC.nulo, dk }] },
       { label: '2022 · 1º turno', sub: fmtN(b.C22) + ' votaram', base: b.C22, baseLabel: 'de quem votou', segs: [{ label: 'Jair', v: b.J22, c: CC.flavio }, { label: 'Outros (Tebet, Ciro etc.)', short: 'Outros', v: b.O22, c: CC.tw }, { label: 'Lula', v: b.L22, c: CC.lula }, { label: 'Branco', v: b.BR22, c: CC.branco, dk }, { label: 'Nulo', v: b.NU22, c: CC.nulo, dk }] },
-      { label: '2026 · 1º turno', sub: fmtN(b.Cp) + ' votaram', base: b.Cp, baseLabel: 'de quem votou', segs: [{ label: 'Flávio', v: b.F, c: CC.flavio }, { label: 'Terceira via e outros', short: 'Outros', v: b.TW + b.O, c: CC.tw }, { label: 'Lula', v: b.L, c: CC.lula }, { label: 'Branco', v: b.BR, c: CC.branco, dk }, { label: 'Nulo', v: b.NU, c: CC.nulo, dk }] }];
-    stackBars($('#yearBars'), rows); legendRow($('#yearLegend'), [['Jair / Flávio', CC.flavio], ['Outros candidatos', CC.tw], ['Haddad / Lula', CC.lula], ['Branco', CC.branco], ['Nulo', CC.nulo]]);
+      { label: '2026 · 1º turno', sub: fmtN(b.Cp) + ' votaram', base: b.Cp, baseLabel: 'de quem votou', segs: presSegs(b) }];
+    stackBars($('#yearBars'), rows); legendRow($('#yearLegend'), [['Jair / Flávio', CC.flavio], ['Outros candidatos (2018 e 2022)', CC.tw]].concat(TW3.map(c => [c.short + ' (2026)', CC[c.k]]), [['Nanicos (2026)', CC.outros], ['Haddad / Lula', CC.lula], ['Branco', CC.branco], ['Nulo', CC.nulo]]));
   } else { $('#yearBars').innerHTML = '<p class="lead">Sem dados de 2018/2022 para este caso.</p>'; $('#yearLegend').innerHTML = ''; }
   const minE = +$('#jairRankMin').value, M = METRICS.dJair; let items;
   if (s.type === 'br' || s.type === 'reg') { const st = ufsOf(s).map(u => ({ label: DATA.ufs[u].nome, v: M.get(UFAGG[u]), d: UFAGG[u].Fh - UFAGG[u].J22, go: { type: 'uf', uf: u } })); const mu = munsOf(s).filter(m => m.b.TE >= minE && m.b.HN).map(m => ({ label: m.nm + ' / ' + m.uf.toUpperCase(), v: M.get(m.b), d: m.b.Fh - m.b.J22, go: { type: 'mun', id: m.id } })); items = mu; $('#jairRankLead').textContent = `Municípios ${s.type === 'reg' ? 'da região' : 'do Brasil'}${minE ? ' com ' + minE / 1000 + ' mil+ eleitores' : ''}, em pontos percentuais dos válidos. Estados: ${st.sort((a, b2) => b2.v - a.v).slice(0, 3).map(x => x.label + ' ' + fmtPP(x.v)).join(', ')} lideram os ganhos.`; }
@@ -758,7 +835,7 @@ function syncSliders() {
 function onScenChange() { const s = SCOPE, b = caseB(s), sc = scenScope(s); renderHeader(s, b, sc); renderScen(s, b, sc); }
 ['pF', 'pTW', 'pBN'].forEach(k => $('#' + k).addEventListener('input', e => { PRM[k] = +e.target.value / 100; syncSliders(); onScenChange(); }));
 function renderFree() {
-  const sel = (id, v) => { $(id).innerHTML = Object.entries(METRICS).map(([k, M]) => `<option value="${k}">${M.label}</option>`).join(''); $(id).value = v; };
+  const sel = (id, v) => { $(id).innerHTML = Object.entries(METRICS).filter(([k, M]) => !M.cats).map(([k, M]) => `<option value="${k}">${M.label}</option>`).join(''); $(id).value = v; };
   sel('#scX', SCF.xk); sel('#scY', SCF.yk); $('#scC').value = SCF.color;
   $('#scPresets').innerHTML = SC_PRESETS.map((p, i) => `<button class="chip ${p.x === SCF.xk && p.y === SCF.yk ? 'on' : ''}" data-i="${i}">${p.l}</button>`).join('');
   $$('#scPresets .chip').forEach(bt => bt.onclick = () => { const p = SC_PRESETS[+bt.dataset.i]; SCF.xk = p.x; SCF.yk = p.y; SCF.diag = p.d; renderFree(); });
@@ -771,7 +848,7 @@ function renderFree() {
 }
 function fillRankUnit() { const sel = $('#rankUnit'), cur = sel.value, opts = []; if (SCOPE.type === 'br' || SCOPE.type === 'reg') opts.push(['ufs', 'Estados']); opts.push(['mun', 'Municípios']); if (SCOPE.type === 'mun' && byId[SCOPE.id].z) opts.push(['zon', 'Zonas desta cidade']); sel.innerHTML = opts.map(o => `<option value="${o[0]}">${o[1]}</option>`).join(''); if (opts.some(o => o[0] === cur)) sel.value = cur; }
 function renderRank() {
-  if (!$('#rankMetric').options.length) { $('#rankMetric').innerHTML = Object.entries(METRICS).map(([k, M]) => `<option value="${k}">${M.label}</option>`).join(''); $('#rankMetric').value = MAPMETRIC; }
+  if (!$('#rankMetric').options.length) { $('#rankMetric').innerHTML = Object.entries(METRICS).filter(([k, M]) => !M.cats).map(([k, M]) => `<option value="${k}">${M.label}</option>`).join(''); $('#rankMetric').value = METRICS[MAPMETRIC].cats ? 'tw' : MAPMETRIC; }
   fillRankUnit(); const unit = $('#rankUnit').value, M = METRICS[$('#rankMetric').value], ord = $('#rankOrder').value, minE = +$('#rankMin').value; let items = [];
   if (unit === 'ufs') items = ufsOf(SCOPE).map(u => ({ label: DATA.ufs[u].nome, v: M.get(UFAGG[u]), go: { type: 'uf', uf: u } }));
   else if (unit === 'zon') { const m = byId[SCOPE.id]; items = m.z.map(z => { const zb = blocs(m.uf, z); return { label: 'Zona ' + z.z + (z.nm ? ' · ' + z.nm : ''), v: M.get(zb), go: null }; }); }
@@ -806,10 +883,10 @@ function renderCands(s) {
   const el = $('#candsBody'), b = caseB(s);
   if (s.type === 'uf' || s.type === 'mun') { const uf = scopeUF(s), U = DATA.ufs[uf], m = s.type === 'mun' ? byId[s.id] : null;
     el.innerHTML = `<div class="card"><p class="lead">"Campo de Lula" = coligação oficial com o PT. "Esquerda" = partido de esquerda fora dessa coligação. "Não-lulista" = todos os demais (direita e centro). Passe o mouse (ou toque) no partido para ver a coligação.</p>${candTable('Governador', U.gov, m ? m.g : U.gov.map(c => c.v), b.VVgN, !!m)}${candTable('Senado (2 vagas)', U.sen, m ? m.s : U.sen.map(c => c.v), b.VVsN, !!m)}</div>` + congressHTML([uf], UFAGG[uf]); }
-  else { const rows = ufsOf(s).map(u => { const bb = UFAGG[u], sc = scen(bb, PRM); return { u, nome: DATA.ufs[u].nome, F: pct(bb.F, bb.VVp), J: pct(bb.J22, bb.VV22), dJ: pct(bb.Fh, bb.VVph) - pct(bb.J22, bb.VV22), L: pct(bb.L, bb.VVp), TW: pct(bb.TW, bb.VVp), GNL: pct(bb.GNL, bb.VVgN), est: sc.LtoNL, lb: bb.lb0, st: DATA.ufs[u].stance }; });
+  else { const rows = ufsOf(s).map(u => { const bb = UFAGG[u], sc = scen(bb, PRM); return { u, nome: DATA.ufs[u].nome, F: pct(bb.F, bb.VVp), J: pct(bb.J22, bb.VV22), dJ: pct(bb.Fh, bb.VVph) - pct(bb.J22, bb.VV22), L: pct(bb.L, bb.VVp), TW: pct(bb.TW, bb.VVp), cury: pct(bb.cury, bb.VVp), renan: pct(bb.renan, bb.VVp), caiado: pct(bb.caiado, bb.VVp), zema: pct(bb.zema, bb.VVp), GNL: pct(bb.GNL, bb.VVgN), est: sc.LtoNL, lb: bb.lb0, st: DATA.ufs[u].stance }; });
     rows.sort((a, c) => { const x = a[UFSORT.k], y = c[UFSORT.k]; if (typeof x === 'string') return UFSORT.d === 'asc' ? x.localeCompare(y, 'pt') : y.localeCompare(x, 'pt'); return UFSORT.d === 'asc' ? x - y : y - x; });
     const th = (k, l, r) => `<th class="${r ? 'r' : ''}" data-k="${k}">${l}${UFSORT.k === k ? (UFSORT.d === 'desc' ? ' ↓' : ' ↑') : ''}</th>`;
-    el.innerHTML = `<div class="card"><h3>Estados</h3><p class="lead">Toque ou clique numa linha para abrir; no título de uma coluna para ordenar.</p><div class="scroll"><table class="t" id="ufT"><tr>${th('nome', 'Estado')}${th('F', 'Flávio', 1)}${th('J', 'Jair 2022', 1)}${th('dJ', 'Δ Jair', 1)}${th('L', 'Lula', 1)}${th('TW', '3ª via', 1)}${th('GNL', 'Gov. não-lul.', 1)}${th('est', 'Lula → gov. não-lul.', 1)}${th('lb', 'Mínimo', 1)}${th('st', 'Governador')}</tr>${rows.map(r => `<tr class="click" data-uf="${r.u}"><td>${esc(r.nome)}</td><td class="r">${fmtP(r.F)}</td><td class="r">${fmtP(r.J)}</td><td class="r"><span class="delta ${r.dJ >= 0 ? 'up' : 'dn'}">${fmtPP(r.dJ)}</span></td><td class="r">${fmtP(r.L)}</td><td class="r">${fmtP(r.TW)}</td><td class="r">${fmtP(r.GNL)}</td><td class="r">${fmtShort(r.est)}</td><td class="r">${fmtShort(r.lb)}</td><td>${r.st === '2º turno' ? '2º turno' : r.st === 'neutro' ? 'neutro' : 'apoia ' + r.st}</td></tr>`).join('')}</table></div></div>` + congressHTML(ufsOf(s), b);
+    el.innerHTML = `<div class="card"><h3>Estados</h3><p class="lead">Toque ou clique numa linha para abrir; no título de uma coluna para ordenar.</p><div class="scroll"><table class="t" id="ufT"><tr>${th('nome', 'Estado')}${th('F', 'Flávio', 1)}${th('J', 'Jair 2022', 1)}${th('dJ', 'Δ Jair', 1)}${th('L', 'Lula', 1)}${th('TW', '3ª via', 1)}${TW3.map(c => th(c.k, c.short, 1)).join('')}${th('GNL', 'Gov. não-lul.', 1)}${th('est', 'Lula → gov. não-lul.', 1)}${th('lb', 'Mínimo', 1)}${th('st', 'Governador')}</tr>${rows.map(r => `<tr class="click" data-uf="${r.u}"><td>${esc(r.nome)}</td><td class="r">${fmtP(r.F)}</td><td class="r">${fmtP(r.J)}</td><td class="r"><span class="delta ${r.dJ >= 0 ? 'up' : 'dn'}">${fmtPP(r.dJ)}</span></td><td class="r">${fmtP(r.L)}</td><td class="r">${fmtP(r.TW)}</td>${TW3.map(c => `<td class="r">${fmtP(r[c.k], c.k === 'zema' ? 2 : 1)}</td>`).join('')}<td class="r">${fmtP(r.GNL)}</td><td class="r">${fmtShort(r.est)}</td><td class="r">${fmtShort(r.lb)}</td><td>${r.st === '2º turno' ? '2º turno' : r.st === 'neutro' ? 'neutro' : 'apoia ' + r.st}</td></tr>`).join('')}</table></div></div>` + congressHTML(ufsOf(s), b);
     $$('#ufT tr.click').forEach(tr => tr.onclick = () => setScope({ type: 'uf', uf: tr.dataset.uf }));
     $$('#ufT th').forEach(t => t.onclick = () => { const k = t.dataset.k; UFSORT = { k, d: UFSORT.k === k && UFSORT.d === 'desc' ? 'asc' : 'desc' }; renderCands(SCOPE); }); }
   requestAnimationFrame(() => requestAnimationFrame(() => $$('#candsBody .sbseg').forEach(d => d.style.width = d.dataset.w + '%')));
@@ -817,13 +894,13 @@ function renderCands(s) {
 let ZSORT = { k: 'gap', d: 'desc' };
 function renderZones(s) {
   const el = $('#zonesCard'); if (s.type !== 'mun' || !byId[s.id].z) { el.innerHTML = ''; return; } const m = byId[s.id];
-  const rows = m.z.map(z => { const b = blocs(m.uf, z); return { z: z.z, nm: z.nm, TE: b.TE, F: pct(b.F, b.VVp), L: pct(b.L, b.VVp), TW: pct(b.TW, b.VVp), GNL: pct(b.GNL, b.VVgN), GLE: pct(b.GLE, b.VVgN), cross: pct(b.L - b.GLE, b.Cg), gap: pct(b.GNL, b.VVgN) - pct(b.F, b.VVp), lb: b.lb0 }; });
+  const rows = m.z.map(z => { const b = blocs(m.uf, z); return { z: z.z, nm: z.nm, TE: b.TE, F: pct(b.F, b.VVp), L: pct(b.L, b.VVp), TW: pct(b.TW, b.VVp), cury: pct(b.cury, b.VVp), renan: pct(b.renan, b.VVp), caiado: pct(b.caiado, b.VVp), zema: pct(b.zema, b.VVp), GNL: pct(b.GNL, b.VVgN), GLE: pct(b.GLE, b.VVgN), cross: pct(b.L - b.GLE, b.Cg), gap: pct(b.GNL, b.VVgN) - pct(b.F, b.VVp), lb: b.lb0 }; });
   rows.sort((a, c) => { const x = a[ZSORT.k], y = c[ZSORT.k]; if (typeof x === 'string') return ZSORT.d === 'asc' ? x.localeCompare(y) : y.localeCompare(x); return ZSORT.d === 'asc' ? x - y : y - x; });
   const th = (k, l, r) => `<th class="${r ? 'r' : ''}" data-k="${k}">${l}${ZSORT.k === k ? (ZSORT.d === 'desc' ? ' ↓' : ' ↑') : ''}</th>`;
-  el.innerHTML = `<h3>Zonas eleitorais de ${esc(m.nm)}</h3><p class="lead">Mesma análise dentro da cidade (só 2026: as zonas mudaram desde 2022). "Diferença" = governador não-lulista menos Flávio. "Voto cruzado" = Lula acima da esquerda para governador, em % de quem votou.</p><div class="scroll"><table class="t" id="zT"><tr>${th('z', 'Zona')}${th('TE', 'Eleitores', 1)}${th('F', 'Flávio', 1)}${th('L', 'Lula', 1)}${th('TW', '3ª via', 1)}${th('GNL', 'Gov. não-lul.', 1)}${th('GLE', 'Gov. esq.', 1)}${th('gap', 'Diferença', 1)}${th('cross', 'Voto cruzado', 1)}${th('lb', 'Mínimo', 1)}</tr>${rows.map(r => `<tr><td>${r.z}${r.nm ? ' · ' + esc(r.nm) : ''}</td><td class="r">${fmtN(r.TE)}</td><td class="r">${fmtP(r.F)}</td><td class="r">${fmtP(r.L)}</td><td class="r">${fmtP(r.TW)}</td><td class="r">${fmtP(r.GNL)}</td><td class="r">${fmtP(r.GLE)}</td><td class="r">${fmtPP(r.gap)}</td><td class="r">${fmtP(r.cross)}</td><td class="r">${fmtN(r.lb)}</td></tr>`).join('')}</table></div>`;
+  el.innerHTML = `<h3>Zonas eleitorais de ${esc(m.nm)}</h3><p class="lead">Mesma análise dentro da cidade (só 2026: as zonas mudaram desde 2022). "Diferença" = governador não-lulista menos Flávio. "Voto cruzado" = Lula acima da esquerda para governador, em % de quem votou.</p><div class="scroll"><table class="t" id="zT"><tr>${th('z', 'Zona')}${th('TE', 'Eleitores', 1)}${th('F', 'Flávio', 1)}${th('L', 'Lula', 1)}${th('TW', '3ª via', 1)}${TW3.map(c => th(c.k, c.short, 1)).join('')}${th('GNL', 'Gov. não-lul.', 1)}${th('GLE', 'Gov. esq.', 1)}${th('gap', 'Diferença', 1)}${th('cross', 'Voto cruzado', 1)}${th('lb', 'Mínimo', 1)}</tr>${rows.map(r => `<tr><td>${r.z}${r.nm ? ' · ' + esc(r.nm) : ''}</td><td class="r">${fmtN(r.TE)}</td><td class="r">${fmtP(r.F)}</td><td class="r">${fmtP(r.L)}</td><td class="r">${fmtP(r.TW)}</td>${TW3.map(c => `<td class="r">${fmtP(r[c.k], c.k === 'zema' ? 2 : 1)}</td>`).join('')}<td class="r">${fmtP(r.GNL)}</td><td class="r">${fmtP(r.GLE)}</td><td class="r">${fmtPP(r.gap)}</td><td class="r">${fmtP(r.cross)}</td><td class="r">${fmtN(r.lb)}</td></tr>`).join('')}</table></div>`;
   $$('#zT th').forEach(t => t.onclick = () => { const k = t.dataset.k; ZSORT = { k, d: ZSORT.k === k && ZSORT.d === 'desc' ? 'asc' : 'desc' }; renderZones(SCOPE); });
 }
-function metricsRow(s) { const b = caseB(s), sc = scenScope(s), k = kindOf(b, sc); return [['Eleitores', b.TE, 'n'], ['Flávio 2026', pct(b.F, b.VVp), 'p'], ['Jair 2022 (1º turno)', b.HN ? pct(b.J22, b.VV22) : null, 'p'], ['Flávio − Jair 2022', b.HN ? pct(b.Fh, b.VVph) - pct(b.J22, b.VV22) : null, 'pp'], ['Jair 2022 (2º turno)', b.HN ? pct(b.J22b, b.VV22b) : null, 'p'], ['Lula 2026', pct(b.L, b.VVp), 'p'], ['Lula 2022 (1º turno)', b.HN ? pct(b.L22, b.VV22) : null, 'p'], ['Terceira via', pct(b.TW, b.VVp), 'p'], ['Gov. não-lulista', pct(b.GNL, b.VVgN), 'p'], ['Gov. esquerda', pct(b.GLE, b.VVgN), 'p'], ['Senado não-lulista', pct(b.SNL, b.VVsN), 'p'], ['Gov. não-lulista − Flávio (votos)', b.GNL - b.F, 'v'], ['Mínimo garantido Lula → gov. não-lulista', b.lb0, 'v'], ['Estimativa Lula → gov. não-lulista', sc.LtoNL, 'v'], ['… em % dos eleitores de Lula', pct(sc.LtoNL, b.L * b.Cg / b.Cp), 'p'], ['Tipo de caso', k.label, 't']]; }
+function metricsRow(s) { const b = caseB(s), sc = scenScope(s), k = kindOf(b, sc); return [['Eleitores', b.TE, 'n'], ['Flávio 2026', pct(b.F, b.VVp), 'p'], ['Jair 2022 (1º turno)', b.HN ? pct(b.J22, b.VV22) : null, 'p'], ['Flávio − Jair 2022', b.HN ? pct(b.Fh, b.VVph) - pct(b.J22, b.VV22) : null, 'pp'], ['Jair 2022 (2º turno)', b.HN ? pct(b.J22b, b.VV22b) : null, 'p'], ['Lula 2026', pct(b.L, b.VVp), 'p'], ['Lula 2022 (1º turno)', b.HN ? pct(b.L22, b.VV22) : null, 'p'], ['Terceira via', pct(b.TW, b.VVp), 'p'], ...TW3.map(c => [c.nome + ' (' + c.p + ')', pct(b[c.k], b.VVp), 'p']), ['Gov. não-lulista', pct(b.GNL, b.VVgN), 'p'], ['Gov. esquerda', pct(b.GLE, b.VVgN), 'p'], ['Senado não-lulista', pct(b.SNL, b.VVsN), 'p'], ['Gov. não-lulista − Flávio (votos)', b.GNL - b.F, 'v'], ['Mínimo garantido Lula → gov. não-lulista', b.lb0, 'v'], ['Estimativa Lula → gov. não-lulista', sc.LtoNL, 'v'], ['… em % dos eleitores de Lula', pct(sc.LtoNL, b.L * b.Cg / b.Cp), 'p'], ['Tipo de caso', k.label, 't']]; }
 function renderCompare(s) {
   const el = $('#compareCard'); if (!PIN || sameScope(PIN, s)) { el.innerHTML = '<p class="lead">Fixe um caso e abra outro para comparar.</p>'; return; }
   const A = metricsRow(PIN), B = metricsRow(s);
@@ -871,7 +948,7 @@ $('#btnTheme').onclick = () => { THEME = THEME === 'dark' ? 'light' : 'dark'; ro
 $('#methodBox').innerHTML = `<h2>Método e glossário</h2><p>As <b>mesmas pessoas</b> votam para presidente, governador e Senado. Comparando as escolhas em cada município e zona dá para ver onde a direita e o centro tiveram votos que Flávio não teve, e comparar Flávio com Jair em 2018 e 2022.</p><dl>
 <dt>Campo de Lula e esquerda</dt><dd>Candidato cuja coligação oficial no TSE inclui o PT, mais candidatos de partidos de esquerda fora dessa coligação (PSOL, PSB, PDT, PCdoB etc.).</dd>
 <dt>Não-lulista</dt><dd>Todos os demais candidatos: direita e centro (Tarcísio, Cleitinho, Raquel Lyra, Braide, Daniel Vilela...). Não é sinônimo de bolsonarista.</dd>
-<dt>Terceira via</dt><dd>Augusto Cury, Renan Santos, Ronaldo Caiado e Romeu Zema.</dd>
+<dt>Terceira via</dt><dd>Augusto Cury (Avante), Renan Santos (Missão), Ronaldo Caiado (PSD) e Romeu Zema (Novo). Cada um aparece separado: no painel "Terceira via, candidato por candidato" da Visão geral, nas barras, nas tabelas de estados e zonas, na comparação e no mapa, que tem uma camada para cada um, a soma dos quatro e quem foi o mais votado entre eles em cada município.</dd>
 <dt>Voto cruzado</dt><dd>Eleitor que vota em Lula para presidente e em não-lulista para governador (ou o contrário).</dd>
 <dt>A conta exata</dt><dd>Votos dos não-lulistas para governador = votos de Flávio + o que Lula teve a mais que a esquerda para governador + votos nos outros presidenciáveis + diferença de branco/nulo + eleitores em trânsito. Identidade contábil, sem estimativa.</dd>
 <dt>Mínimo garantido</dt><dd>Em cada zona eleitoral, se Lula teve mais votos do que a esquerda para governador somada a todos os brancos e nulos para governador, o excesso só pode ter ido para um não-lulista. Somando zona por zona, chega-se a um piso que vale em qualquer hipótese.</dd>
@@ -882,7 +959,7 @@ $('#methodBox').innerHTML = `<h2>Método e glossário</h2><p>As <b>mesmas pessoa
 <p style="color:var(--mut)">Fontes: TSE (resultados oficiais 2026, 100% apurado; dados abertos de 2018 e 2022); malha municipal do IBGE; G1 (apoio dos governadores eleitos, 05/10/2026). Cálculos próprios.</p><button class="btn pri" id="btnCloseMethod">Fechar</button>`;
 $('#btnMethod').onclick = () => { $('#method').hidden = false; }; $('#method').addEventListener('mousedown', e => { if (e.target.id === 'method' || e.target.id === 'btnCloseMethod') $('#method').hidden = true; });
 const TOUR = [
-  { sel: '#metricBar', t: 'Escolha o que o mapa mostra', d: 'Indicadores de 2026 à esquerda e comparações com Jair à direita. Experimente "Flávio − Jair 2022". ' + (COARSE ? 'Toque' : 'Passe o mouse') + ' na escala de cores para destacar uma faixa.' },
+  { sel: '#metricBar', t: 'Escolha o que o mapa mostra', d: 'Indicadores de 2026, a terceira via candidato por candidato e comparações com Jair. Experimente "Flávio − Jair 2022" ou "Quem liderou". ' + (COARSE ? 'Toque' : 'Passe o mouse') + ' na escala de cores para destacar uma faixa.' },
   { sel: '#mapStage', t: 'Navegue pelo mapa', d: COARSE ? 'Toque num estado para entrar e num município para abrir o caso. Use dois dedos para dar zoom e mover o mapa, e o botão "Fixar para comparar" para comparar dois lugares.' : 'Clique num estado para entrar e num município para abrir o caso. Role para dar zoom, arraste para mover e use Shift+clique para fixar um município para comparar.' },
   { sel: '#caseHeader', t: 'O caso aberto', d: 'Os números principais: Flávio x Lula, governador, voto cruzado e a diferença em relação a Jair em 2022.' },
   { sel: '#tabs', tab: 'jair', t: 'Flávio x Jair', d: 'Trajetória 2018, 2022 e 2026, onde Flávio ganhou ou perdeu em relação ao pai e um gráfico com cada município.' },
