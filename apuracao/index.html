@@ -240,6 +240,23 @@ table.t tr.sel td{background:var(--panel2)}
 .chip.ref.on{background:var(--panel2);border-color:var(--ink2);color:var(--ink)}
 .chip .chk{display:inline-block;width:11px;text-align:center;font-weight:800}
 .rsw{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:7px}
+.proj .phead{display:flex;justify-content:space-between;align-items:baseline;gap:4px 12px;flex-wrap:wrap}
+.ptag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#d97706;border:1px solid rgba(217,119,6,.45);border-radius:999px;padding:1px 8px;margin-left:6px;vertical-align:middle}
+.pmeta{font-size:12px;color:var(--mut)}
+.pnums{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0 4px}
+.pnum{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
+.pnum .n{font-size:12px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pnum .v{font-size:30px;font-weight:780;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.15}
+.pnum .s{font-size:11.5px;color:var(--mut)}
+.pline svg{display:block;width:100%;max-width:760px;height:auto;margin:0 auto}
+.pmsg{font-size:13.5px;line-height:1.55;margin:6px 0}
+.pens{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.preg{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-top:6px}
+.preg div{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:7px 9px;font-size:11.5px;color:var(--mut);min-width:0}
+.preg b{display:block;color:var(--ink);font-size:14px;font-variant-numeric:tabular-nums}
+.proj details,#extCard details{margin-top:10px;font-size:12.5px;color:var(--ink2);line-height:1.55}.proj summary{cursor:pointer;color:var(--acc);font-weight:600}
+.proj details p{margin:6px 0 0}
+@media(max-width:760px){.preg{grid-template-columns:repeat(3,minmax(0,1fr))}.pnum .v{font-size:25px}.hm2{display:none}}
 </style>
 </head>
 <body>
@@ -261,6 +278,7 @@ table.t tr.sel td{background:var(--panel2)}
 <div class="modebar" id="modeBar" hidden></div>
 <main class="wrap">
   <section class="card hero" id="hero"></section>
+  <section class="card proj" id="projCard"></section>
   <div class="grid2">
     <section class="card">
       <h2>Evolução de cada candidato</h2>
@@ -291,6 +309,11 @@ table.t tr.sel td{background:var(--panel2)}
     <h2>Regiões</h2>
     <p class="lead" id="regLead">Votação em cada região conforme avança a apuração dela, comparada com o 2º turno de 2022 e o 1º turno de 2026 no mesmo ponto da apuração.</p>
     <div class="smalls" id="smalls"></div>
+  </section>
+  <section class="card" id="extCard">
+    <h2>Exterior</h2>
+    <p class="lead">Votos dos brasileiros que vivem fora do país. O TSE soma o exterior ao resultado nacional; aqui ele aparece separado, comparado com o 1º turno e com 2022.</p>
+    <div id="extBody"></div>
   </section>
   <section class="card">
     <h2>Estados</h2>
@@ -325,6 +348,11 @@ const REGN = {N:'Norte',NE:'Nordeste',CO:'Centro-Oeste',SE:'Sudeste',S:'Sul',EX:
 const REGC = {BR:'var(--ink)',N:'#34d399',NE:'#fbbf24',CO:'#f472b6',SE:'#38bdf8',S:'#a78bfa',EX:'#94a3b8'};
 const TILE = {rr:[0,1],ap:[0,3],am:[1,1],pa:[1,3],ma:[1,4],ce:[1,5],rn:[1,6],ac:[2,0],ro:[2,1],mt:[2,2],to:[2,3],pi:[2,4],pe:[2,5],pb:[2,6],ms:[3,2],go:[3,3],ba:[3,4],se:[3,5],al:[3,6],pr:[4,2],df:[4,3],mg:[4,4],es:[4,5],sc:[5,2],sp:[5,3],rj:[5,4],rs:[6,2],zz:[6,5]};
 const R22 = REF['2t2022'], R26 = REF['1t2026'];
+// faixas de erro da projeção: maior erro (pontos) do método em 2022 a partir de cada % apurado (por município e por estado)
+const BAND = {"mun":[[1,0.59],[2,0.59],[3,0.59],[5,0.59],[7,0.59],[10,0.59],[15,0.59],[20,0.59],[25,0.59],[30,0.57],[40,0.5],[50,0.43],[60,0.35],[70,0.26],[80,0.14],[90,0.07],[95,0.04],[98,0.02],[99.5,0.01]],"uf":[[1,1.11],[2,0.96],[3,0.96],[5,0.92],[7,0.92],[10,0.92],[15,0.92],[20,0.92],[25,0.92],[30,0.92],[40,0.89],[50,0.81],[60,0.7],[70,0.59],[80,0.39],[90,0.23],[95,0.14],[98,0.07],[99.5,0.02]]};
+// 1º turno de 2022 por estado (Jair, Lula), base da projeção no ensaio de 2022
+const B22UF = {"ma":[983861,2603454],"mg":[5239264,5802571],"sp":[12239989,10490032],"ce":[1377827,3578355],"pb":[717416,1554868],"pr":[3628612,2363492],"rs":[3245023,2806672],"sc":[2694406,1279216],"es":[1160030,897348],"to":[379194,434303],"ba":[2047599,5873081],"zz":[122548,138933],"rn":[622731,1264179],"go":[1920203,1454723],"se":[378610,828716],"pi":[406897,1518008],"al":[621515,974156],"pa":[1884673,2443730],"df":[910397,649534],"ms":[794206,588323],"mt":[1102866,633748],"ap":[187621,197382],"rj":[4831246,3847143],"pe":[1630938,3558322],"am":[880198,1019684],"ac":[275582,129022],"ro":[581306,261749],"rr":[207587,68760]};
+const EXTF = "Pelo horário de chegada dos boletins ao TSE, no 1º turno metade das seções do exterior chegou até 17h09, 90% até 21h10 e a última às 22h55 (horário de Brasília); no 2º turno de 2022, a última chegou às 22h32.";
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
@@ -394,6 +422,7 @@ async function fetchLive() {
   const keyOf = u => { const a = ab && (ab.abr || []).find(x => x.cdabr === u); return a ? (a.s && a.s.st) + '|' + a.ht + '|' + a.dt : null; };
   const need = UFS.filter(u => { const k = keyOf(u); return !S.ufCache[u] || k === null || S.ufKey[u] !== k; });
   const res = await Promise.allSettled(need.map(async u => { const j = await getJSON(`${base}/${u}/${u}-c0001-e${pad6(E)}-u.json`); S.ufCache[u] = parseU(j); S.ufKey[u] = keyOf(u); }));
+  await Promise.allSettled(need.map(async u => { const j = await getJSON(`${base}/${u}/${u}-e${pad6(E)}-ab.json`); const M = {}; for (const x of j.abr || []) if (x.tpabr === 'mun' && x.e) M[String(+x.cdabr)] = [+x.e.est || 0, +x.e.te || 0, +(x.s && x.s.st) || 0, +(x.s && x.s.ts) || 0]; (S.abMun || (S.abMun = {}))[u] = M; }));
   const fails = res.filter(r => r.status === 'rejected').length;
   return { br, fails };
 }
@@ -653,7 +682,8 @@ function render() {
   } else { $('#updTse').innerHTML = 'Ensaio com dados reais de ' + (S.ensKey === '2t2022' ? '2022' : '2026'); $('#updNext').textContent = 'horário simulado'; }
   if (S.err && S.mode === 'live' && cur) $('#updTse').innerHTML += ` · <span class="dn">${esc(S.err)}</span>`;
   S.events = buildEvents();
-  renderHero(); renderEvo(); renderProg(); renderDiff(); renderSmalls(); renderStates(); renderLog();
+  S.proj = projCompute(cur);
+  renderHero(); renderProj(); renderEvo(); renderProg(); renderDiff(); renderSmalls(); renderExt(); renderStates(); renderLog();
 }
 function candColor(k) { const c = S.cands.find(c => c.k === k); return c ? c.color : 'var(--co)'; }
 function renderHero() {
@@ -672,9 +702,9 @@ function renderHero() {
   const winTag = S.mode === 'ensaio' ? 'VENCEU EM 2022' : 'ELEITO · TSE';
   h.innerHTML = `
   <div class="duel">
-    <div class="cand"><div class="nm"><span class="sw" style="background:${A.color}"></span>${esc(A.nm)}</div><div class="pc" style="color:${A.color}">${fmtP(pa)}</div><div class="vt">${fmtN(br.c[A.k] || 0)} votos</div>${win === A.k ? `<span class="tag win">${winTag}</span>` : lead > 0 ? `<span class="tag">à frente por ${fmtBig(lead)} de votos</span>` : ''}</div>
+    <div class="cand"><div class="nm"><span class="sw" style="background:${A.color}"></span>${esc(A.nm)}</div><div class="pc" style="color:${A.color}">${fmtP(pa)}</div><div class="vt">${fmtN(br.c[A.k] || 0)} votos</div>${win === A.k ? `<span class="tag win">${winTag}</span>` : lead > 0 ? `<span class="tag">à frente por ${fmtBig(lead)}${lead >= 1e6 ? " de" : ""} votos</span>` : ''}</div>
     <div class="mid"><div class="apRing"><svg viewBox="0 0 116 116"><circle class="bg" cx="58" cy="58" r="49"/><circle class="fg" cx="58" cy="58" r="49" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C * (1 - (pst || 0) / 100)).toFixed(1)}"/></svg><div class="tx"><div><b>${fmtP(pst, pst >= 100 ? 0 : 2)}</b><span>apurado</span></div></div></div></div>
-    <div class="cand r"><div class="nm">${esc(B.nm)}<span class="sw" style="background:${B.color}"></span></div><div class="pc" style="color:${B.color}">${fmtP(pb)}</div><div class="vt">${fmtN(br.c[B.k] || 0)} votos</div>${win === B.k ? `<span class="tag win">${winTag}</span>` : lead < 0 ? `<span class="tag">à frente por ${fmtBig(-lead)} de votos</span>` : ''}</div>
+    <div class="cand r"><div class="nm">${esc(B.nm)}<span class="sw" style="background:${B.color}"></span></div><div class="pc" style="color:${B.color}">${fmtP(pb)}</div><div class="vt">${fmtN(br.c[B.k] || 0)} votos</div>${win === B.k ? `<span class="tag win">${winTag}</span>` : lead < 0 ? `<span class="tag">à frente por ${fmtBig(-lead)}${-lead >= 1e6 ? " de" : ""} votos</span>` : ''}</div>
   </div>
   <div class="tug"><div style="width:${pa || 0}%;background:${A.color}"></div>${po > 0.05 ? `<div style="width:${po}%;background:var(--co)"></div>` : ''}<div style="width:${pb || 0}%;background:${B.color}"></div></div>
   <div class="tugLab"><span>${fmtN(br.vv)} votos válidos apurados</span><span>linha central = 50%</span></div>
@@ -821,12 +851,13 @@ function renderStates() {
     ${a != null ? row(S.mode === 'ensaio' ? 'Agora (ensaio)' : 'Agora, 2º turno 2026', a, b, `${esc(A.short)} − ${esc(B.short)}: ${(x.c[A.k] - x.c[B.k]) >= 0 ? '+' : '−'}${fmtBig(Math.abs(x.c[A.k] - x.c[B.k]))}`) : ''}
     ${row('2º turno 2022 (final)', j22, l22, `Jair x Lula${sameP22 != null ? ` · com ${fmtP(p, 0)} apurado: Jair ${fmtP(sameP22, 1)}` : ''}`)}
     ${row('1º turno 2026 (final)', f26, l26, 'Flávio x Lula')}
+    ${(() => { const q = S.proj && !S.proj.early && S.proj.per ? S.proj.per[u] : null; if (!q || S.proj.pst >= 100 || !(q.a + q.b > 0)) return ''; const v = extTwo(q.a, q.b); return row('Projeção de chegada', v, 100 - v, 'estimativa do laboratório'); })()}
     ${a != null ? `<div class="note">${esc(A.short)} está ${fmtPP(a - j22)} em relação ao resultado final do Jair em 2022 e ${fmtPP(a - f26)} em relação ao próprio 1º turno.</div>` : ''}`;
   // tabela
-  const rows = UFS.map(u => { const x = cur && cur.uf[u], r22 = R22.uf[u]; const a = sh(x, A.k), b = sh(x, B.k); return { u, nm: UFN[u], pst: x ? pct(x.st, x.ts) : 0, a, b, d: x ? (x.c[A.k] || 0) - (x.c[B.k] || 0) : null, v22: a != null ? a - 100 * r22.c.J / r22.vv : null, v26: a != null ? a - 100 * R26.uf[u].c.F / R26.uf[u].vv : null }; });
+  const rows = UFS.map(u => { const x = cur && cur.uf[u], r22 = R22.uf[u]; const a = sh(x, A.k), b = sh(x, B.k); const pq = S.proj && !S.proj.early && S.proj.per ? S.proj.per[u] : null; return { u, nm: UFN[u], pj: pq ? extTwo(pq.a, pq.b) : null, pst: x ? pct(x.st, x.ts) : 0, a, b, d: x ? (x.c[A.k] || 0) - (x.c[B.k] || 0) : null, v22: a != null ? a - 100 * r22.c.J / r22.vv : null, v26: a != null ? a - 100 * R26.uf[u].c.F / R26.uf[u].vv : null }; });
   const k = S.sort.k, dd = S.sort.d; rows.sort((p, q) => { const va = p[k], vb = q[k]; if (va == null && vb == null) return 0; if (va == null) return 1; if (vb == null) return -1; return typeof va === 'string' ? dd * va.localeCompare(vb) : dd * (va - vb); });
-  const cols = [['nm', 'Estado'], ['pst', 'Apurado'], ['a', esc(A.short)], ['b', esc(B.short)], ['d', 'Diferença'], ['v22', esc(A.short) + ' x Jair 2022'], ['v26', esc(A.short) + ' x 1º turno']];
-  $('#ufTable').innerHTML = `<thead><tr>${cols.map(([c, l]) => `<th data-k="${c}" class="${c === 'nm' ? '' : 'r'}">${l}${S.sort.k === c ? (S.sort.d < 0 ? ' ↓' : ' ↑') : ''}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr data-u="${r.u}" class="${S.selUF === r.u ? 'sel' : ''}"><td>${r.nm}</td><td class="r"><span class="minibar"><i style="width:${r.pst || 0}%"></i></span>${fmtP(r.pst, 1)}</td><td class="r" style="color:${A.color}">${fmtP(r.a, 1)}</td><td class="r" style="color:${B.color}">${fmtP(r.b, 1)}</td><td class="r">${r.d == null ? '—' : (r.d >= 0 ? '+' : '−') + fmtShort(Math.abs(r.d))}</td><td class="r ${r.v22 > 0 ? 'up' : r.v22 < 0 ? 'dn' : ''}">${fmtPP(r.v22)}</td><td class="r ${r.v26 > 0 ? 'up' : r.v26 < 0 ? 'dn' : ''}">${fmtPP(r.v26)}</td></tr>`).join('')}</tbody>`;
+  const cols = [['nm', 'Estado'], ['pst', 'Apurado'], ['a', esc(A.short)], ['b', esc(B.short)], ['d', 'Diferença'], ['pj', 'Projeção ' + esc(A.short)], ['v22', esc(A.short) + ' x Jair 2022'], ['v26', esc(A.short) + ' x 1º turno']];
+  $('#ufTable').innerHTML = `<thead><tr>${cols.map(([c, l]) => `<th data-k="${c}" class="${c === 'nm' ? '' : 'r'}">${l}${S.sort.k === c ? (S.sort.d < 0 ? ' ↓' : ' ↑') : ''}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr data-u="${r.u}" class="${S.selUF === r.u ? 'sel' : ''}"><td>${r.nm}</td><td class="r"><span class="minibar"><i style="width:${r.pst || 0}%"></i></span>${fmtP(r.pst, 1)}</td><td class="r" style="color:${A.color}">${fmtP(r.a, 1)}</td><td class="r" style="color:${B.color}">${fmtP(r.b, 1)}</td><td class="r">${r.d == null ? '—' : (r.d >= 0 ? '+' : '−') + fmtShort(Math.abs(r.d))}</td><td class="r" style="color:${r.pj == null ? 'var(--mut)' : r.pj >= 50 ? A.color : B.color}">${r.pj == null ? '—' : fmtP(r.pj, 1)}</td><td class="r ${r.v22 > 0 ? 'up' : r.v22 < 0 ? 'dn' : ''}">${fmtPP(r.v22)}</td><td class="r ${r.v26 > 0 ? 'up' : r.v26 < 0 ? 'dn' : ''}">${fmtPP(r.v26)}</td></tr>`).join('')}</tbody>`;
   $$('#ufTable th').forEach(th => th.onclick = () => { const c = th.dataset.k; S.sort = { k: c, d: S.sort.k === c ? -S.sort.d : (c === 'nm' ? 1 : -1) }; renderStates(); });
   $$('#ufTable tbody tr').forEach(tr => tr.onclick = () => { S.selUF = tr.dataset.u; renderStates(); $('#ufDetail').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); });
 }
@@ -851,16 +882,174 @@ function renderLog() {
 }
 function renderFoot() {
   $('#foot').innerHTML = `<b>Fontes.</b> Resultados ao vivo: arquivos públicos de divulgação do TSE (resultados.tse.jus.br), consultados direto pelo seu navegador a cada minuto. Curvas de 2022 e do 1º turno de 2026: boletins de urna publicados pelo TSE (dados abertos), somados na ordem em que cada boletim chegou ao TSE. A reconstrução de 2022 bate com cópias dos arquivos do TSE salvas naquela noite pelo Internet Archive (17h23: 4,1% apurado e Jair 53,9%, contra 3,96% e 54,04% no TSE; 18h22: 45,8% e 50,45%, contra 45,28% e 50,47%; 19h43: 98,12% e Lula 50,78%, igual ao TSE).<br>
-  <b>Como ler.</b> "% apurado" = seções totalizadas pelo TSE. "Mix de estados 2022" e "votos que faltam" são contas simples feitas aqui, não projeções oficiais: a primeira aplica o resultado de 2022 de cada estado aos votos já apurados nele; a segunda multiplica o eleitorado que falta apurar em cada estado pela proporção de votos válidos já observada nele. Quem declara o eleito é o TSE. Inclui os votos do exterior, como o TSE.<br>
+  <b>Como ler.</b> "% apurado" = seções totalizadas pelo TSE. "Mix de estados 2022" e "votos que faltam" são contas simples feitas aqui, não projeções oficiais: a primeira aplica o resultado de 2022 de cada estado aos votos já apurados nele; a segunda multiplica o eleitorado que falta apurar em cada estado pela proporção de votos válidos já observada nele. A "Projeção de chegada" é uma estimativa do laboratório: o quadro explica como ela é feita e quanto errou na apuração de 2022. Quem declara o eleito é o TSE. Inclui os votos do exterior, como o TSE.<br>
   <b>Atualização.</b> Automática a cada 60 segundos, mais o botão Atualizar. ${S.mode === 'live' ? `O histórico da noite fica salvo neste aparelho${S.serverHist ? ` e foi completado com ${S.serverHist} ${S.serverHist === 1 ? 'registro' : 'registros'} do coletor automático` : ''}.` : ''} <a href="../batalha/">Ver a apuração como batalha</a> · <a href="../">Voltar ao Laboratório do voto</a>.`;
 }
 function toast(m) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = m; document.body.appendChild(t); setTimeout(() => t.remove(), 2400); }
+
+// ---------- projeção de chegada (estimativa do laboratório, não é resultado oficial) ----------
+// Para cada estado: compara o parcial com o 1º turno dos mesmos municípios já apurados, mede a mudança (swing)
+// e o crescimento de votos, e aplica isso aos municípios que faltam (com o 1º turno deles como base).
+// Testado minuto a minuto na apuração do 2º turno de 2022 (faixas em BAND).
+const PJ = { base: null, err: false, loading: false, prev: null };
+async function loadBase() {
+  if (PJ.base || PJ.loading) return; PJ.loading = true;
+  try { PJ.base = await getJSON('base-1t2026.json', 25000); } catch (e) { PJ.err = true; }
+  PJ.loading = false; if (S.cur) { S.proj = projCompute(S.cur); renderProj(); renderExt(); }
+}
+function projCore(ufs, kappa) {
+  let swN = 0, wN = 0, gV = 0, gB = 0;
+  for (const o of ufs) { const v = o.a + o.b, bcv = o.bc[0] + o.bc[1]; if (v > 0 && bcv > 0) { swN += v * (o.a / v - o.bc[0] / bcv); wN += v; gV += v; gB += bcv; } }
+  const sw = wN ? swN / wN : 0, g = gB ? gV / gB : 1;
+  let A = 0, B = 0; const per = {};
+  for (const o of ufs) {
+    const v = o.a + o.b, bcv = o.bc[0] + o.bc[1], brv = o.br[0] + o.br[1];
+    const bcs = bcv > 0 ? o.bc[0] / bcv : (brv > 0 ? o.br[0] / brv : 0.5), brs = brv > 0 ? o.br[0] / brv : bcs;
+    const su = v > 0 && bcv > 0 ? o.a / v - bcs : sw, s = (o.c * su + kappa * sw) / (o.c + kappa);
+    const gu = bcv > 1000 && v > 0 ? v / bcv : g, gg = (o.c * gu + kappa * g) / (o.c + kappa);
+    const q = Math.max(0, Math.min(1, brs + s)), R = Math.max(0, brv * gg);
+    per[o.u] = { a: o.a + q * R, b: o.b + (1 - q) * R, q, R, how: o.how };
+    A += per[o.u].a; B += per[o.u].b;
+  }
+  return { A, B, sw, g, per };
+}
+function projBaseUF() {
+  if (S.mode === 'ensaio') return S.ensKey === '2t2022' ? B22UF : null;
+  const o = {}; for (const u of UFS) { const r = R26.uf[u]; if (r) o[u] = [r.c.F, r.c.L]; } return o;
+}
+function projBand(p, m) { const t = BAND[m] || BAND.uf; let v = t[0][1]; for (const [q, e] of t) if (p >= q) v = e; return Math.max(1.5 * v, p < 5 ? 1.2 : 0.2); }
+function projCompute(snap) {
+  if (!snap || !snap.br || !snap.br.ts) return null;
+  const BU = projBaseUF(); if (!BU) return null;
+  const pst = pct(snap.br.st, snap.br.ts);
+  if (!(pst >= 1)) return { early: true, pst };
+  const ka = '22', kb = '13', useMun = S.mode === 'live' && PJ.base && PJ.base.uf && S.abMun;
+  const ufs = []; let nMun = 0;
+  for (const u of UFS) {
+    const x = snap.uf[u], bb = BU[u]; if (!bb) continue;
+    const c = x && x.te ? Math.min(1, x.est / x.te) : 0, a = x && x.c ? (x.c[ka] || 0) : 0, b = x && x.c ? (x.c[kb] || 0) : 0;
+    let o = null;
+    const M = useMun ? S.abMun[u] : null, BM = useMun ? PJ.base.uf[u] : null;
+    if (M && BM) {
+      let c0 = 0, c1 = 0, r0 = 0, r1 = 0, est = 0, tt = 0;
+      for (const cd in BM) { const bm = BM[cd], m = M[cd], f = m && m[1] > 0 ? Math.min(1, m[0] / m[1]) : 0; c0 += f * bm[0]; c1 += f * bm[1]; r0 += (1 - f) * bm[0]; r1 += (1 - f) * bm[1]; }
+      for (const cd in M) { est += M[cd][0]; tt += M[cd][1]; }
+      if (tt > 0 && Math.abs(est / tt - c) <= 0.03) o = { u, a, b, c, bc: [c0, c1], br: [r0, r1], how: 'mun' };
+    }
+    if (!o) o = { u, a, b, c, bc: [c * bb[0], c * bb[1]], br: [(1 - c) * bb[0], (1 - c) * bb[1]], how: 'uf' };
+    if (o.how === 'mun') nMun++;
+    ufs.push(o);
+  }
+  const r = projCore(ufs, 0.1), V = r.A + r.B; if (!(V > 0)) return null;
+  const method = nMun >= 20 ? 'mun' : 'uf', reg = {}; let rem = 0;
+  for (const u in r.per) { const p = r.per[u], g = REG[u] || 'EX'; rem += p.R; const o = reg[g] || (reg[g] = { R: 0, qa: 0 }); o.R += p.R; o.qa += p.q * p.R; }
+  return { pst, pa: 100 * r.A / V, pb: 100 * r.B / V, A: r.A, B: r.B, d: r.A - r.B, V, rem, reg, per: r.per, method, nMun, band: projBand(pst, method) };
+}
+function projHow(ens) {
+  return `<b>Como a projeção é feita.</b> O TSE informa, para cada município, quanto do eleitorado já foi apurado. Para cada estado, o laboratório compara o resultado parcial com o 1º turno dos mesmos municípios já apurados, mede a mudança entre Flávio e Lula e o quanto o número de votos cresceu, e aplica isso aos municípios que faltam, usando o 1º turno deles. Com pouca apuração num estado, usa a mudança média do país. Assim, a projeção corrige o efeito da ordem de chegada das urnas (no 1º turno, o Nordeste chegou mais tarde).
+  <br><b>Teste.</b> Refizemos a apuração do 2º turno de 2022 minuto a minuto: depois de 10% apurado, o maior erro do método foi de 0,6 ponto; depois de 60%, 0,35; depois de 80%, 0,14. Nessa mesma apuração, o resultado parcial chegou a errar 4,6 pontos com 5% apurado. A faixa mostrada aqui é 1,5 vez o maior erro de 2022 daquele ponto em diante, e no mínimo 1,2 ponto antes de 5% apurado.${ens ? ' No ensaio, a conta usa só os totais de cada estado (sem o detalhe por município), comparando com o 1º turno de 2022; por isso a faixa é maior.' : ''}
+  <br>É uma estimativa do laboratório, não um resultado oficial. Quem declara o eleito é o TSE.`;
+}
+const qtyV = (n, w) => fmtBig(n) + (Math.abs(n) >= 1e6 ? ' de ' : ' ') + (w || 'votos');
+function projLine(P, cur, A, B) {
+  const nar = window.innerWidth < 600, W = nar ? 360 : 640, H = 84, l = nar ? 20 : 16, r = nar ? 20 : 16, y = 46;
+  const now = cur && cur.br.vv ? 100 * (cur.br.c[A.k] || 0) / ((cur.br.c[A.k] || 0) + (cur.br.c[B.k] || 0)) : null;
+  const span = Math.max(4, Math.abs(P.pa - 50) + P.band + 1.2, now != null ? Math.abs(now - 50) + 1 : 0), x0 = 50 - span, x1 = 50 + span;
+  const X = v => l + (W - l - r) * (Math.max(x0, Math.min(x1, v)) - x0) / (x1 - x0);
+  const st = span > 12 ? 5 : span > 6 || nar ? 2 : 1;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Projeção de chegada">`;
+  s += `<rect x="${l}" y="${y - 9}" width="${X(50) - l}" height="18" rx="5" fill="${B.color}" opacity=".13"/><rect x="${X(50)}" y="${y - 9}" width="${W - r - X(50)}" height="18" rx="5" fill="${A.color}" opacity=".13"/>`;
+  for (let v = Math.ceil(x0 / st) * st; v <= x1; v += st) s += `<line x1="${X(v)}" x2="${X(v)}" y1="${y + 11}" y2="${y + 15}" stroke="var(--line2)"/><text x="${X(v)}" y="${y + 29}" font-size="12" fill="var(--mut)" text-anchor="middle"${v === 50 ? ' font-weight="700"' : ''}>${v}%</text>`;
+  const lo = P.pa - P.band, hi = P.pa + P.band, col = P.pa >= 50 ? A.color : B.color;
+  s += `<rect x="${X(lo)}" y="${y - 9}" width="${Math.max(2, X(hi) - X(lo))}" height="18" rx="5" fill="${col}" opacity=".45"/>`;
+  s += `<line x1="${X(50)}" x2="${X(50)}" y1="${y - 13}" y2="${y + 13}" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="3 3"/>`;
+  if (now != null && P.pst < 100) s += `<path d="M${X(now)},${y - 11} l-5,-8 h10 z" fill="var(--mut)"><title>Resultado parcial agora</title></path><text x="${X(now)}" y="${y - 22}" font-size="11" fill="var(--mut)" text-anchor="middle">parcial</text>`;
+  s += `<circle cx="${X(P.pa)}" cy="${y}" r="6.5" fill="${col}" stroke="var(--panel)" stroke-width="2"/>`;
+  s += `<text x="${l}" y="${12}" font-size="12" fill="${B.color}" font-weight="700">← ${esc(B.short)} à frente</text><text x="${W - r}" y="${12}" font-size="12" fill="${A.color}" font-weight="700" text-anchor="end">${esc(A.short)} à frente →</text>`;
+  return s + '</svg>';
+}
+function renderProj() {
+  const el = $('#projCard'); if (!el) return;
+  const cur = S.cur, ens = S.mode === 'ensaio';
+  const [A, B] = S.cands.length ? S.cands : [candMeta('22', null, 2026), candMeta('13', null, 2026)];
+  const head = `<div class="phead"><h2>Projeção de chegada <span class="ptag">estimativa</span></h2><span class="pmeta" id="projMeta"></span></div>`;
+  const how = `<details><summary>Como funciona e quanto erra</summary><p>${projHow(ens)}</p></details>`;
+  if (ens && S.ensKey !== '2t2022') { el.innerHTML = head + `<p class="lead">A projeção é feita para o 2º turno, entre dois candidatos. <a href="?ensaio=2t2022">Veja no ensaio do 2º turno de 2022</a> como ela teria se saído.</p>` + how; return; }
+  const P = S.proj;
+  if (!cur || !cur.br.st || !P || P.early) {
+    const p = P && P.early ? P.pst : 0;
+    el.innerHTML = head + `<p class="lead">Quando 1% das urnas estiver apurado${p ? ` (agora: ${fmtP(p, 2)})` : ''}, aparece aqui uma estimativa de como a apuração deve terminar, com uma faixa de erro. Ela leva em conta onde estão os votos que ainda faltam, já que as urnas não chegam em ordem aleatória.</p>` + how; return;
+  }
+  const done = P.pst >= 100, lo = P.pa - P.band, hi = P.pa + P.band, lead = P.pa >= 50 ? A : B;
+  const call = !done && (lo > 50 ? A : hi < 50 ? B : null);
+  const dg = Math.abs(P.pa - 50) < 1 ? 2 : 1;
+  let msg;
+  if (done) msg = 'Apuração concluída: a projeção é o próprio resultado.';
+  else if (call) msg = `Com ${fmtP(P.pst, 1)} apurado, a projeção indica <b>${esc(call.short)} à frente no fim</b>, com ${fmtP(call === A ? P.pa : P.pb, dg)} dos válidos (faixa de ${fmtP(call === A ? lo : 100 - hi, 1)} a ${fmtP(call === A ? hi : 100 - lo, 1)}).`;
+  else msg = `Com ${fmtP(P.pst, 1)} apurado, <b>a disputa está dentro da faixa de erro</b>: a projeção vai de ${fmtP(lo, 1)} a ${fmtP(hi, 1)} para ${esc(A.short)}. Ainda não dá para cravar quem termina à frente.`;
+  const regs = REGS.filter(g => P.reg[g] && P.reg[g].R > 1000);
+  const remTxt = P.rem > 1000 ? `<p class="pmsg" style="margin-top:4px">Faltam cerca de <b>${qtyV(P.rem, 'votos válidos')}</b>, pela estimativa. Onde estão e para quem a projeção aponta:</p><div class="preg">${regs.map(g => { const o = P.reg[g], qa = 100 * o.qa / o.R; return `<div>${REGS_SHORT[g]}<b>${fmtShort(o.R)}</b><span style="color:${qa >= 50 ? A.color : B.color}">${qa >= 50 ? esc(A.short) : esc(B.short)} ${dec(Math.max(qa, 100 - qa), 0)}%</span></div>`; }).join('')}</div>` : '';
+  let real = '';
+  if (ens && S.ensKey === '2t2022') { const rj = 100 * R22.tot.c.J / R22.tot.vv, e = P.pa - rj; real = `<p class="pmsg pens">Resultado real de 2022: Jair ${fmtP(rj, 2)} x Lula ${fmtP(100 - rj, 2)}. <b>Erro da projeção neste momento: ${dec(Math.abs(e), 2)} ponto${Math.abs(e) >= 2 ? 's' : ''}</b>${Math.abs(e) >= 0.005 ? ` (a mais para ${e > 0 ? 'Jair' : 'Lula'})` : ''}; o parcial está errando ${dec(Math.abs(sh(cur.br, A.k) - rj), 2)}.</p>`; }
+  const dvs = Math.abs(P.d);
+  el.innerHTML = head + `<div class="pnums">
+      <div class="pnum"><div class="n">${esc(A.nm)}</div><div class="v" style="color:${A.color}">${fmtP(P.pa, dg)}</div><div class="s">${done ? 'resultado final' : `faixa: ${fmtP(lo, 1)} a ${fmtP(hi, 1)}`}</div></div>
+      <div class="pnum"><div class="n">${esc(B.nm)}</div><div class="v" style="color:${B.color}">${fmtP(P.pb, dg)}</div><div class="s">${done ? 'resultado final' : `faixa: ${fmtP(100 - hi, 1)} a ${fmtP(100 - lo, 1)}`}</div></div></div>
+    <div class="pline">${projLine(P, cur, A, B)}</div>
+    <p class="pmsg">${msg} ${done ? '' : `Diferença projetada: <b>${qtyV(dvs)}</b> para ${esc(lead.short)}.`}</p>${real}${done ? '' : remTxt}${how}`;
+  const m = $('#projMeta'); if (m) m.textContent = done ? '' : `± ${dec(P.band, 1)} ponto${P.band >= 2 ? 's' : ''} · ${P.method === 'mun' ? 'por município' : 'por estado'}`;
+}
+
+// ---------- exterior ----------
+const extTwo = (a, b) => a + b > 0 ? 100 * a / (a + b) : null;
+function extTop() {
+  const te = (PJ.base && PJ.base.zzte) || {}, M = (S.abMun && S.abMun.zz) || {};
+  return Object.keys(te).map(cd => [cd, (M[cd] && M[cd][1]) || te[cd]]).sort((p, q) => q[1] - p[1]).slice(0, 12).map(x => x[0]);
+}
+async function extCities() {
+  if (S.mode !== 'live' || S.zzBusy) return;
+  S.zzBusy = true; renderExt();
+  const E = S.E, list = extTop();
+  await Promise.allSettled(list.map(async cd => { const j = await getJSON(`${TSE}/${CICLO}/${E}/dados/zz/zz${String(cd).padStart(5, '0')}-c0001-e${pad6(E)}-u.json`, 12000); const p = parseU(j); (S.zzCity || (S.zzCity = {}))[cd] = { a: p.c['22'] || 0, b: p.c['13'] || 0, st: p.st, ts: p.ts }; }));
+  S.zzBusy = false; S.zzAt = new Date(); renderExt();
+}
+function renderExt() {
+  const el = $('#extBody'); if (!el) return;
+  const cur = S.cur, ens = S.mode === 'ensaio', x = cur && cur.uf ? cur.uf.zz : null;
+  const [A, B] = S.cands.length ? S.cands : [candMeta('22', null, 2026), candMeta('13', null, 2026)];
+  const r26 = R26.uf.zz, r22 = R22.uf.zz;
+  const a = x && x.c ? (x.c[A.k] || 0) : 0, b = x && x.c ? (x.c[B.k] || 0) : 0, p = x && x.ts ? pct(x.st, x.ts) : null;
+  const sa = extTwo(a, b), P = S.proj && !S.proj.early && S.proj.per ? S.proj.per.zz : null, pa = P ? extTwo(P.a, P.b) : null;
+  const e22 = ens && S.ensKey === '2t2022', nA = e22 ? 'Jair' : A.short, nB = B.short;
+  const box = (t, v, s, col) => `<div class="ins"><div class="t">${t}</div><div class="v"${col ? ` style="color:${col}"` : ''}>${v}</div><div class="s">${s}</div></div>`;
+  let h = `<div class="insights">${box('Apurado no exterior', p != null ? fmtP(p, p >= 100 ? 0 : 1) : '—', x && x.ts ? `${fmtN(x.st)} de ${fmtN(x.ts)} seções` : 'aguardando o TSE')}
+    ${box(esc(nA) + ' no exterior', sa != null ? fmtP(sa, 1) : '—', sa != null ? fmtN(a) + ' votos' : 'dos votos dados aos dois', A.color)}
+    ${box(esc(nB) + ' no exterior', sa != null ? fmtP(100 - sa, 1) : '—', sa != null ? fmtN(b) + ' votos' : 'dos votos dados aos dois', B.color)}
+    ${box('Projeção para o exterior', pa != null && p < 100 ? `${esc(pa >= 50 ? nA : nB)} ${fmtP(Math.max(pa, 100 - pa), 1)}` : '—', pa != null && p < 100 ? 'estimativa do fim da apuração no exterior' : p >= 100 ? 'apuração do exterior concluída' : ens && !e22 ? 'a projeção é feita para o 2º turno' : 'aparece com 1% apurado no país')}</div>`;
+  const f26 = extTwo(r26.c.F, r26.c.L), j22 = extTwo(r22.c.J, r22.c.L);
+  const rows = [];
+  if (sa != null) rows.push([ens ? 'Ensaio, agora' : '2º turno 2026, parcial', sa, `${fmtP(p, 1)} apurado${ens && !e22 ? ', só entre os dois' : ''}`]);
+  if (!e22) rows.push(['1º turno 2026' + (ens ? ' (final)' : ''), f26, `só entre os dois; com os outros candidatos: Flávio ${fmtP(100 * r26.c.F / r26.vv, 1)}, Lula ${fmtP(100 * r26.c.L / r26.vv, 1)}`]);
+  if (!ens || e22) rows.push(['2º turno 2022' + (e22 ? ' (final)' : ''), j22, 'Jair x Lula']);
+  h += `<div class="tblWrap" style="margin-top:12px"><table class="t"><thead><tr><th>Eleição</th><th class="r">${e22 ? 'Jair' : ens ? 'Flávio' : 'Flávio / Jair'}</th><th class="r">Lula</th><th class="hm2">Obs.</th></tr></thead><tbody>${rows.map(r => `<tr><td>${r[0]}</td><td class="r" style="color:${A.color}">${fmtP(r[1], 1)}</td><td class="r" style="color:${B.color}">${fmtP(100 - r[1], 1)}</td><td class="hm2" style="color:var(--mut)">${r[2]}</td></tr>`).join('')}</tbody></table></div>`;
+  const shareVV = 100 * r26.vv / R26.tot.vv, shareApt = 100 * r26.apt / R26.tot.apt, turn = 100 * r26.comp / r26.apt;
+  h += `<p class="lead" style="margin:12px 0 0">O exterior tem ${fmtN(r26.apt)} eleitores (${dec(shareApt, 2)}% do total). No 1º turno, ${dec(turn, 0)}% deles votaram e o exterior deu ${fmtN(r26.vv)} votos válidos, ${dec(shareVV, 2)}% dos válidos do país: mesmo que todos fossem para um só candidato, mudaria o resultado nacional em no máximo ${dec(shareVV, 1)} ponto. ${EXTF}</p>`;
+  if (!ens && PJ.base && PJ.base.zzte) {
+    const list = extTop(), M = (S.abMun && S.abMun.zz) || {}, nm = PJ.base.zzn || {}, base = PJ.base.uf.zz || {};
+    h += `<div class="ctrl" style="margin-top:12px"><b style="font-size:13px">Maiores cidades</b><button class="btn" id="btnZZ"${S.zzBusy ? ' disabled' : ''}>${S.zzBusy ? 'Buscando…' : S.zzCity ? 'Atualizar cidades' : 'Ver o resultado de cada cidade'}</button></div>
+    <div class="tblWrap"><table class="t"><thead><tr><th>Cidade</th><th class="r">Apurado</th><th class="r">1º turno: Flávio x Lula</th><th class="r">2º turno: Flávio x Lula</th></tr></thead><tbody>${list.map(cd => { const m = M[cd], bb = base[cd] || [0, 0, 0], f1 = extTwo(bb[0], bb[1]), z = S.zzCity && S.zzCity[cd], f2 = z ? extTwo(z.a, z.b) : null, pp = m && m[3] ? pct(m[2], m[3]) : (z && z.ts ? pct(z.st, z.ts) : null); return `<tr><td>${esc(tc(nm[cd] || cd))}</td><td class="r">${pp != null ? fmtP(pp, 0) : '—'}</td><td class="r">${f1 != null ? `<span style="color:${A.color}">${dec(f1, 0)}</span> x <span style="color:${B.color}">${dec(100 - f1, 0)}</span>` : '—'}</td><td class="r">${f2 != null ? `<b style="color:${A.color}">${dec(f2, 0)}</b> x <b style="color:${B.color}">${dec(100 - f2, 0)}</b>` : z ? 'sem votos ainda' : '—'}</td></tr>`; }).join('')}</tbody></table></div>
+    <p class="lead" style="margin:6px 0 0">Percentuais só entre os dois candidatos. ${S.zzAt ? `Resultados das cidades buscados às ${String(S.zzAt.getHours()).padStart(2, '0')}h${String(S.zzAt.getMinutes()).padStart(2, '0')}.` : 'O resultado de cada cidade é buscado no TSE quando você toca no botão.'}</p>`;
+  }
+  el.innerHTML = h;
+  const bz = $('#btnZZ'); if (bz) bz.onclick = extCities;
+}
+function tc(s) { return String(s).toLowerCase().replace(/(^|[\s\-'(])([a-zà-ú])/g, (m, a, c) => a + c.toUpperCase()).replace(/\b(De|Da|Do|Das|Dos|E)\b/g, w => w.toLowerCase()); }
 
 // ---------- controles ----------
 $('#btnRefresh').onclick = () => { if (S.mode === 'ensaio') { toast('No ensaio, os dados avançam sozinhos'); return; } refresh(true); };
 $('#btnTheme').onclick = () => { const n = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', n); try { localStorage.setItem('lv-theme', n); } catch (e) {} render(); };
 $$('#segX button').forEach(b => b.onclick = () => { S.xMode = b.dataset.v; $$('#segX button').forEach(x => x.classList.toggle('on', x === b)); renderEvo(); renderDiff(); });
-let rsz, lastW = window.innerWidth; window.addEventListener('resize', () => { clearTimeout(rsz); rsz = setTimeout(() => { if (Math.abs(window.innerWidth - lastW) < 3) return; lastW = window.innerWidth; renderEvo(); renderProg(); renderDiff(); renderSmalls(); }, 150); });
+let rsz, lastW = window.innerWidth; window.addEventListener('resize', () => { clearTimeout(rsz); rsz = setTimeout(() => { if (Math.abs(window.innerWidth - lastW) < 3) return; lastW = window.innerWidth; renderProj(); renderEvo(); renderProg(); renderDiff(); renderSmalls(); }, 150); });
 // no celular, tocar fora de um gráfico fecha a caixinha de valores
 document.addEventListener('touchstart', e => { if (e.target.closest && e.target.closest('.chart')) return; $$('.chart .ctip').forEach(t => t.hidden = true); $$('.chart .xh').forEach(l => l.setAttribute('visibility', 'hidden')); $$('.chart .hdots').forEach(g => g.innerHTML = ''); }, { passive: true });
 
@@ -869,7 +1058,7 @@ document.addEventListener('touchstart', e => { if (e.target.closest && e.target.
   refChips(); renderFoot();
   const ens = params.get('ensaio');
   if (ens === '2t2022' || ens === '1t2026') { await startEnsaio(ens); renderFoot(); return; }
-  S.E = await detectE(); S.year = 2026;
+  S.E = await detectE(); S.year = 2026; loadBase();
   await loadHistory();
   if (S.snaps.length) { S.cur = S.snaps[S.snaps.length - 1]; S.status = 'live'; }
   render(); renderFoot();
