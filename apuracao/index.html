@@ -256,6 +256,12 @@ table.t tr.sel td{background:var(--panel2)}
 .preg b{display:block;color:var(--ink);font-size:14px;font-variant-numeric:tabular-nums}
 .proj details,#extCard details{margin-top:10px;font-size:12.5px;color:var(--ink2);line-height:1.55}.proj summary{cursor:pointer;color:var(--acc);font-weight:600}
 .proj details p{margin:6px 0 0}
+.exth{font-size:14px;margin:16px 0 8px;display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.extct{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.extct div{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-width:0;display:flex;flex-direction:column;gap:1px}
+.extct .n{font-size:12px;color:var(--mut)}.extct b{font-size:15px}.extct .s{font-size:11px;color:var(--mut)}
+.extT tr.pr{cursor:pointer}.extT tr.open td{background:var(--panel2)}.extT tr.cr td{font-size:12px;background:var(--panel2)}.extT tr.cr td:first-child{padding-left:22px}
+@media(max-width:760px){.extct{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .trbar{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--line);margin:6px 0 4px}.trbar div{height:100%}
 @media(max-width:760px){.preg{grid-template-columns:repeat(3,minmax(0,1fr))}.pnum .v{font-size:25px}.hm2{display:none}}
 </style>
@@ -427,6 +433,7 @@ async function fetchLive() {
   const need = UFS.filter(u => { const k = keyOf(u); return !S.ufCache[u] || k === null || S.ufKey[u] !== k; });
   const res = await Promise.allSettled(need.map(async u => { const j = await getJSON(`${base}/${u}/${u}-c0001-e${pad6(E)}-u.json`); S.ufCache[u] = parseU(j); S.ufKey[u] = keyOf(u); }));
   await Promise.allSettled(need.map(async u => { const j = await getJSON(`${base}/${u}/${u}-e${pad6(E)}-ab.json`); const M = {}; for (const x of j.abr || []) if (x.tpabr === 'mun' && x.e) M[String(+x.cdabr)] = [+x.e.est || 0, +x.e.te || 0, +(x.s && x.s.st) || 0, +(x.s && x.s.ts) || 0]; (S.abMun || (S.abMun = {}))[u] = M; }));
+  await extSync();
   const fails = res.filter(r => r.status === 'rejected').length;
   return { br, fails };
 }
@@ -1004,48 +1011,82 @@ function renderProj() {
   const m = $('#projMeta'); if (m) m.textContent = done ? '' : `± ${dec(P.band, 1)} ponto${P.band >= 2 ? 's' : ''} · ${P.method === 'mun' ? 'por município' : 'por estado'}`;
 }
 
-// ---------- exterior ----------
+// ---------- exterior: total, continentes, países e cidades ----------
 const extTwo = (a, b) => a + b > 0 ? 100 * a / (a + b) : null;
-function extTop() {
-  const te = (PJ.base && PJ.base.zzte) || {}, M = (S.abMun && S.abMun.zz) || {};
-  return Object.keys(te).map(cd => [cd, (M[cd] && M[cd][1]) || te[cd]]).sort((p, q) => q[1] - p[1]).slice(0, 12).map(x => x[0]);
+const ENSZZ = { data: null, loading: false };
+async function loadEnsZZ() { if (ENSZZ.data || ENSZZ.loading) return; ENSZZ.loading = true; try { ENSZZ.data = await getJSON('ensaio-2t2022-zz.json', 15000); } catch (e) {} ENSZZ.loading = false; renderExt(); }
+// ao vivo: busca no TSE o resultado de cada cidade do exterior que mudou (no máximo 40 por atualização, maiores primeiro)
+async function extSync() {
+  if (S.mode !== 'live' || S.zzSyncing) return; const M = S.abMun && S.abMun.zz; if (!M) return;
+  const E = S.E; S.zzCity = S.zzCity || {};
+  const pend = Object.keys(M).filter(cd => M[cd][2] > 0 && (!S.zzCity[cd] || S.zzCity[cd].st !== M[cd][2])).sort((p, q) => M[q][1] - M[p][1]).slice(0, 60);
+  if (!pend.length) return;
+  S.zzSyncing = true;
+  await Promise.allSettled(pend.map(async cd => { const j = await getJSON(`${TSE}/${CICLO}/${E}/dados/zz/zz${String(cd).padStart(5, '0')}-c0001-e${pad6(E)}-u.json`, 12000); const q = parseU(j); S.zzCity[cd] = { a: q.c['22'] || 0, b: q.c['13'] || 0, st: q.st, ts: q.ts }; }));
+  S.zzSyncing = false; S.zzAt = new Date();
 }
-async function extCities() {
-  if (S.mode !== 'live' || S.zzBusy) return;
-  S.zzBusy = true; renderExt();
-  const E = S.E, list = extTop();
-  await Promise.allSettled(list.map(async cd => { const j = await getJSON(`${TSE}/${CICLO}/${E}/dados/zz/zz${String(cd).padStart(5, '0')}-c0001-e${pad6(E)}-u.json`, 12000); const p = parseU(j); (S.zzCity || (S.zzCity = {}))[cd] = { a: p.c['22'] || 0, b: p.c['13'] || 0, st: p.st, ts: p.ts }; }));
-  S.zzBusy = false; S.zzAt = new Date(); renderExt();
+// cidades do exterior com o dado disponível agora (ao vivo ou no ensaio de 2022)
+function extCityRows() {
+  const B = PJ.base; if (!B || !B.zzp) return null;
+  const ens = S.mode === 'ensaio', e22 = ens && S.ensKey === '2t2022', out = [];
+  if (e22) {
+    const D = ENSZZ.data; if (!D) return null; const m = S.cur ? S.cur.m : -1;
+    for (const cd in D.cid) { const rows = D.cid[cd], fin = rows[rows.length - 1]; let r = null; for (const x of rows) { if (x[0] <= m) r = x; else break; } out.push({ cd, te: D.te[cd], est: r ? r[1] : 0, a: r ? r[2] : 0, b: r ? r[3] : 0, a1: fin[2], b1: fin[3] }); }
+  } else {
+    const M = (S.abMun && S.abMun.zz) || {}, Z = S.zzCity || {}, base = (B.uf && B.uf.zz) || {};
+    for (const cd in B.zzp) { const m = M[cd], z = Z[cd], bb = base[cd] || [0, 0], te = (m && m[1]) || (B.zzte && B.zzte[cd]) || 0; out.push({ cd, te, est: z && z.ts ? te * z.st / z.ts : 0, pend: !!(m && m[2] > 0 && (!z || z.st !== m[2])), a: z ? z.a : 0, b: z ? z.b : 0, a1: bb[0], b1: bb[1] }); }
+  }
+  return out;
+}
+function extGroup(rows, key) {
+  const G = {}, P = PJ.base.zzp;
+  for (const r of rows) { const k = key === 'ct' ? P[r.cd][1] : P[r.cd][0]; const o = G[k] || (G[k] = { nm: k, te: 0, est: 0, a: 0, b: 0, a1: 0, b1: 0, n: 0, rows: [] }); o.te += r.te; o.est += r.est; o.a += r.a; o.b += r.b; o.a1 += r.a1; o.b1 += r.b1; o.n++; o.rows.push(r); }
+  return Object.values(G).sort((p, q) => q.te - p.te);
 }
 function renderExt() {
   const el = $('#extBody'); if (!el) return;
-  const cur = S.cur, ens = S.mode === 'ensaio', x = cur && cur.uf ? cur.uf.zz : null;
+  const cur = S.cur, ens = S.mode === 'ensaio', e22 = ens && S.ensKey === '2t2022', x = cur && cur.uf ? cur.uf.zz : null;
+  if (!PJ.base && !PJ.loading) loadBase();
+  if (e22 && !ENSZZ.data) loadEnsZZ();
   const [A, B] = S.cands.length ? S.cands : [candMeta('22', null, 2026), candMeta('13', null, 2026)];
   const r26 = R26.uf.zz, r22 = R22.uf.zz;
   const a = x && x.c ? (x.c[A.k] || 0) : 0, b = x && x.c ? (x.c[B.k] || 0) : 0, p = x && x.ts ? pct(x.st, x.ts) : null;
   const sa = extTwo(a, b), P = S.proj && !S.proj.early && S.proj.per ? S.proj.per.zz : null, pa = P ? extTwo(P.a, P.b) : null;
-  const e22 = ens && S.ensKey === '2t2022', nA = e22 ? 'Jair' : A.short, nB = B.short;
+  const nA = e22 ? 'Jair' : A.short, nB = B.short;
   const box = (t, v, s, col) => `<div class="ins"><div class="t">${t}</div><div class="v"${col ? ` style="color:${col}"` : ''}>${v}</div><div class="s">${s}</div></div>`;
   let h = `<div class="insights">${box('Apurado no exterior', p != null ? fmtP(p, p >= 100 ? 0 : 1) : '—', x && x.ts ? `${fmtN(x.st)} de ${fmtN(x.ts)} seções` : 'aguardando o TSE')}
-    ${box(esc(nA) + ' no exterior', sa != null ? fmtP(sa, 1) : '—', sa != null ? fmtN(a) + ' votos' : 'dos votos dados aos dois', A.color)}
-    ${box(esc(nB) + ' no exterior', sa != null ? fmtP(100 - sa, 1) : '—', sa != null ? fmtN(b) + ' votos' : 'dos votos dados aos dois', B.color)}
+    ${box(esc(nA) + ' no exterior', sa != null ? fmtP(sa, 1) : '—', sa != null ? fmtN(a) + ' votos' : 'total do exterior', A.color)}
+    ${box(esc(nB) + ' no exterior', sa != null ? fmtP(100 - sa, 1) : '—', sa != null ? fmtN(b) + ' votos' : 'total do exterior', B.color)}
     ${box('Projeção para o exterior', pa != null && p < 100 ? `${esc(pa >= 50 ? nA : nB)} ${fmtP(Math.max(pa, 100 - pa), 1)}` : '—', pa != null && p < 100 ? 'estimativa do fim da apuração no exterior' : p >= 100 ? 'apuração do exterior concluída' : ens && !e22 ? 'a projeção é feita para o 2º turno' : 'aparece com 1% apurado no país')}</div>`;
   const f26 = extTwo(r26.c.F, r26.c.L), j22 = extTwo(r22.c.J, r22.c.L);
   const rows = [];
   if (sa != null) rows.push([ens ? 'Ensaio, agora' : '2º turno 2026, parcial', sa, `${fmtP(p, 1)} apurado${ens && !e22 ? ', só entre os dois' : ''}`]);
   if (!e22) rows.push(['1º turno 2026' + (ens ? ' (final)' : ''), f26, `só entre os dois; com os outros candidatos: Flávio ${fmtP(100 * r26.c.F / r26.vv, 1)}, Lula ${fmtP(100 * r26.c.L / r26.vv, 1)}`]);
   if (!ens || e22) rows.push(['2º turno 2022' + (e22 ? ' (final)' : ''), j22, 'Jair x Lula']);
-  h += `<div class="tblWrap" style="margin-top:12px"><table class="t"><thead><tr><th>Eleição</th><th class="r">${e22 ? 'Jair' : ens ? 'Flávio' : 'Flávio / Jair'}</th><th class="r">Lula</th><th class="hm2">Obs.</th></tr></thead><tbody>${rows.map(r => `<tr><td>${r[0]}</td><td class="r" style="color:${A.color}">${fmtP(r[1], 1)}</td><td class="r" style="color:${B.color}">${fmtP(100 - r[1], 1)}</td><td class="hm2" style="color:var(--mut)">${r[2]}</td></tr>`).join('')}</tbody></table></div>`;
+  h += `<div class="tblWrap" style="margin-top:12px"><table class="t"><thead><tr><th>Total do exterior</th><th class="r">${e22 ? 'Jair' : ens ? 'Flávio' : 'Flávio / Jair'}</th><th class="r">Lula</th><th class="hm2">Obs.</th></tr></thead><tbody>${rows.map(r => `<tr><td>${r[0]}</td><td class="r" style="color:${A.color}">${fmtP(r[1], 1)}</td><td class="r" style="color:${B.color}">${fmtP(100 - r[1], 1)}</td><td class="hm2" style="color:var(--mut)">${r[2]}</td></tr>`).join('')}</tbody></table></div>`;
+  // continentes e países
+  const CR = (!ens || e22) ? extCityRows() : null;
+  if (CR) {
+    const refLab = e22 ? 'Final 2022' : '1º turno', vs = (a2, b2) => { const s2 = extTwo(a2, b2); return s2 == null ? '—' : `<span style="color:${A.color}">${dec(s2, 0)}</span> x <span style="color:${B.color}">${dec(100 - s2, 0)}</span>`; };
+    const cell = o => { const s2 = extTwo(o.a, o.b); return s2 == null ? '<td class="r">—</td><td class="r">—</td>' : `<td class="r" style="color:${A.color};font-weight:700">${fmtP(s2, 1)}</td><td class="r" style="color:${B.color};font-weight:700">${fmtP(100 - s2, 1)}</td>`; };
+    const ap = o => o.te ? fmtP(100 * o.est / o.te, 0) : '—';
+    const CT = extGroup(CR, 'ct');
+    h += `<h3 class="exth">Por continente</h3><div class="extct">${CT.map(o => { const s2 = extTwo(o.a, o.b), s1 = extTwo(o.a1, o.b1); return `<div><span class="n">${esc(o.nm)}</span><b>${s2 == null ? '—' : `<span style="color:${s2 >= 50 ? A.color : B.color}">${esc(s2 >= 50 ? nA : nB)} ${dec(Math.max(s2, 100 - s2), 0)}%</span>`}</b><span class="s">${ap(o)} apurado · ${fmtShort(o.te)} eleitores</span><span class="s">${refLab}: ${s1 == null ? '—' : `${esc(s1 >= 50 ? nA : nB)} ${dec(Math.max(s1, 100 - s1), 0)}%`}</span></div>`; }).join('')}</div>`;
+    const PS = extGroup(CR, 'pais'), all = S.extAll, list = all ? PS : PS.slice(0, 15);
+    h += `<h3 class="exth">Por país <span class="pmeta">${PS.length} países · toque num país para ver as cidades</span></h3>
+    <div class="tblWrap"><table class="t extT"><thead><tr><th>País</th><th class="r hm2">Eleitores</th><th class="r">Apurado</th><th class="r">${esc(nA)}</th><th class="r">${esc(nB)}</th><th class="r hm2">Votos (${esc(nA)} x ${esc(nB)})</th><th class="r">${refLab}</th></tr></thead><tbody>${list.map(o => {
+      const open = S.extOpen === o.nm;
+      let r = `<tr class="pr${open ? ' open' : ''}" data-pais="${esc(o.nm)}"><td style="white-space:nowrap">${o.n > 1 ? (open ? '▾&nbsp;' : '▸&nbsp;') : ''}${esc(o.nm)}</td><td class="r hm2">${fmtN(o.te)}</td><td class="r">${ap(o)}</td>${cell(o)}<td class="r hm2" style="color:var(--mut)">${o.a + o.b > 0 ? fmtN(o.a) + ' x ' + fmtN(o.b) : '—'}</td><td class="r">${vs(o.a1, o.b1)}</td></tr>`;
+      if (open && o.n > 1) r += o.rows.slice().sort((p2, q2) => q2.te - p2.te).map(c => `<tr class="cr"><td>${esc(tc(PJ.base.zzn[c.cd] || c.cd))}</td><td class="r hm2">${fmtN(c.te)}</td><td class="r">${ap(c)}</td>${cell(c)}<td class="r hm2" style="color:var(--mut)">${c.a + c.b > 0 ? fmtN(c.a) + ' x ' + fmtN(c.b) : '—'}</td><td class="r">${vs(c.a1, c.b1)}</td></tr>`).join('');
+      return r; }).join('')}</tbody></table></div>
+    ${PS.length > 15 ? `<div class="ctrl" style="margin-top:6px"><span class="lead" style="margin:0">${all ? `Todos os ${PS.length} países.` : `Os 15 países com mais eleitores; faltam ${PS.length - 15}.`}</span><button class="btn" id="btnExtAll">${all ? 'Mostrar só os 15 maiores' : 'Mostrar todos os países'}</button></div>` : ''}
+    <p class="lead" style="margin:6px 0 0">Percentuais só entre os dois candidatos. "Apurado" é a parte do eleitorado do país já apurada. ${e22 ? 'No ensaio, os números de cada país seguem o horário de chegada dos boletins de 2022.' : `Cada cidade é uma jurisdição consular, agrupada pelo país do consulado (Bruxelas inclui Luxemburgo, por exemplo). O resultado de cada cidade é buscado no TSE quando ela muda${S.zzAt ? `; última busca às ${String(S.zzAt.getHours()).padStart(2, '0')}h${String(S.zzAt.getMinutes()).padStart(2, '0')}` : ''}${(() => { const n = CR.filter(r => r.pend).length; return n ? ` (${n} ${n === 1 ? 'cidade ainda na fila' : 'cidades ainda na fila'})` : ''; })()}.`}</p>`;
+  } else if (!ens || e22) h += `<p class="lead" style="margin:12px 0 0">Carregando os países…</p>`;
   const shareVV = 100 * r26.vv / R26.tot.vv, shareApt = 100 * r26.apt / R26.tot.apt, turn = 100 * r26.comp / r26.apt;
   h += `<p class="lead" style="margin:12px 0 0">O exterior tem ${fmtN(r26.apt)} eleitores (${dec(shareApt, 2)}% do total). No 1º turno, ${dec(turn, 0)}% deles votaram e o exterior deu ${fmtN(r26.vv)} votos válidos, ${dec(shareVV, 2)}% dos válidos do país: mesmo que todos fossem para um só candidato, mudaria o resultado nacional em no máximo ${dec(shareVV, 1)} ponto. ${EXTF}</p>`;
-  if (!ens && PJ.base && PJ.base.zzte) {
-    const list = extTop(), M = (S.abMun && S.abMun.zz) || {}, nm = PJ.base.zzn || {}, base = PJ.base.uf.zz || {};
-    h += `<div class="ctrl" style="margin-top:12px"><b style="font-size:13px">Maiores cidades</b><button class="btn" id="btnZZ"${S.zzBusy ? ' disabled' : ''}>${S.zzBusy ? 'Buscando…' : S.zzCity ? 'Atualizar cidades' : 'Ver o resultado de cada cidade'}</button></div>
-    <div class="tblWrap"><table class="t"><thead><tr><th>Cidade</th><th class="r">Apurado</th><th class="r">1º turno: Flávio x Lula</th><th class="r">2º turno: Flávio x Lula</th></tr></thead><tbody>${list.map(cd => { const m = M[cd], bb = base[cd] || [0, 0, 0], f1 = extTwo(bb[0], bb[1]), z = S.zzCity && S.zzCity[cd], f2 = z ? extTwo(z.a, z.b) : null, pp = m && m[3] ? pct(m[2], m[3]) : (z && z.ts ? pct(z.st, z.ts) : null); return `<tr><td>${esc(tc(nm[cd] || cd))}</td><td class="r">${pp != null ? fmtP(pp, 0) : '—'}</td><td class="r">${f1 != null ? `<span style="color:${A.color}">${dec(f1, 0)}</span> x <span style="color:${B.color}">${dec(100 - f1, 0)}</span>` : '—'}</td><td class="r">${f2 != null ? `<b style="color:${A.color}">${dec(f2, 0)}</b> x <b style="color:${B.color}">${dec(100 - f2, 0)}</b>` : z ? 'sem votos ainda' : '—'}</td></tr>`; }).join('')}</tbody></table></div>
-    <p class="lead" style="margin:6px 0 0">Percentuais só entre os dois candidatos. ${S.zzAt ? `Resultados das cidades buscados às ${String(S.zzAt.getHours()).padStart(2, '0')}h${String(S.zzAt.getMinutes()).padStart(2, '0')}.` : 'O resultado de cada cidade é buscado no TSE quando você toca no botão.'}</p>`;
-  }
   el.innerHTML = h;
-  const bz = $('#btnZZ'); if (bz) bz.onclick = extCities;
+  $$('#extBody tr.pr').forEach(tr => tr.onclick = () => { const n = tr.dataset.pais; S.extOpen = S.extOpen === n ? null : n; renderExt(); });
+  const ba = $('#btnExtAll'); if (ba) ba.onclick = () => { S.extAll = !S.extAll; renderExt(); };
 }
 function tc(s) { return String(s).toLowerCase().replace(/(^|[\s\-'(])([a-zà-ú])/g, (m, a, c) => a + c.toUpperCase()).replace(/\b(De|Da|Do|Das|Dos|E)\b/g, w => w.toLowerCase()); }
 
