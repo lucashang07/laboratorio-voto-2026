@@ -256,6 +256,7 @@ table.t tr.sel td{background:var(--panel2)}
 .preg b{display:block;color:var(--ink);font-size:14px;font-variant-numeric:tabular-nums}
 .proj details,#extCard details{margin-top:10px;font-size:12.5px;color:var(--ink2);line-height:1.55}.proj summary{cursor:pointer;color:var(--acc);font-weight:600}
 .proj details p{margin:6px 0 0}
+.trbar{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--line);margin:6px 0 4px}.trbar div{height:100%}
 @media(max-width:760px){.preg{grid-template-columns:repeat(3,minmax(0,1fr))}.pnum .v{font-size:25px}.hm2{display:none}}
 </style>
 </head>
@@ -279,6 +280,7 @@ table.t tr.sel td{background:var(--panel2)}
 <main class="wrap">
   <section class="card hero" id="hero"></section>
   <section class="card proj" id="projCard"></section>
+  <section class="card proj" id="trCard"></section>
   <div class="grid2">
     <section class="card">
       <h2>Evolução de cada candidato</h2>
@@ -351,8 +353,10 @@ const R22 = REF['2t2022'], R26 = REF['1t2026'];
 // faixas de erro da projeção: maior erro (pontos) do método em 2022 a partir de cada % apurado (por município e por estado)
 const BAND = {"mun":[[1,0.59],[2,0.59],[3,0.59],[5,0.59],[7,0.59],[10,0.59],[15,0.59],[20,0.59],[25,0.59],[30,0.57],[40,0.5],[50,0.43],[60,0.35],[70,0.26],[80,0.14],[90,0.07],[95,0.04],[98,0.02],[99.5,0.01]],"uf":[[1,1.11],[2,0.96],[3,0.96],[5,0.92],[7,0.92],[10,0.92],[15,0.92],[20,0.92],[25,0.92],[30,0.92],[40,0.89],[50,0.81],[60,0.7],[70,0.59],[80,0.39],[90,0.23],[95,0.14],[98,0.07],[99.5,0.02]]};
 // 1º turno de 2022 por estado (Jair, Lula), base da projeção no ensaio de 2022
-const B22UF = {"ma":[983861,2603454],"mg":[5239264,5802571],"sp":[12239989,10490032],"ce":[1377827,3578355],"pb":[717416,1554868],"pr":[3628612,2363492],"rs":[3245023,2806672],"sc":[2694406,1279216],"es":[1160030,897348],"to":[379194,434303],"ba":[2047599,5873081],"zz":[122548,138933],"rn":[622731,1264179],"go":[1920203,1454723],"se":[378610,828716],"pi":[406897,1518008],"al":[621515,974156],"pa":[1884673,2443730],"df":[910397,649534],"ms":[794206,588323],"mt":[1102866,633748],"ap":[187621,197382],"rj":[4831246,3847143],"pe":[1630938,3558322],"am":[880198,1019684],"ac":[275582,129022],"ro":[581306,261749],"rr":[207587,68760]};
+const B22UF = {"pa":[1884673,2443730,351533],"rs":[3245023,2806672,586057],"pr":[3628612,2363492,574660],"mt":[1102866,633748,106274],"ba":[2047599,5873081,502328],"sc":[2694406,1279216,357362],"pi":[406897,1518008,119481],"zz":[122548,138933,33044],"mg":[5239264,5802571,974798],"sp":[12239989,10490032,2926313],"ce":[1377827,3578355,473082],"al":[621515,974156,128546],"pe":[1630938,3558322,262749],"am":[880198,1019684,156794],"pb":[717416,1554868,149404],"rj":[4831246,3847143,778288],"ms":[794206,588323,124460],"rn":[622731,1264179,120354],"go":[1920203,1454723,306543],"to":[379194,434303,48295],"ma":[983861,2603454,194330],"es":[1160030,897348,163752],"se":[378610,828716,91106],"ro":[581306,261749,60180],"ac":[275582,129022,36313],"df":[910397,649534,202644],"ap":[187621,197382,47158],"rr":[207587,68760,22022]};
 const EXTF = "Pelo horário de chegada dos boletins ao TSE, no 1º turno metade das seções do exterior chegou até 17h09, 90% até 21h10 e a última às 22h55 (horário de Brasília); no 2º turno de 2022, a última chegou às 22h32.";
+// faixa de erro da transferência da terceira via: maior erro (pontos) desta conta em 2022 a partir de cada % apurado
+const BAND_TR = {"mun":[[1,11.0],[2,11.0],[5,11.0],[10,11.0],[20,10.8],[30,9.9],[40,8.6],[50,6.8],[60,5.3],[70,3.9],[80,2.3],[90,1.2],[95,0.7],[98,0.3],[99.5,0.2]],"uf":[[1,23.8],[2,22.0],[5,15.9],[10,14.7],[20,14.5],[30,14.4],[40,13.7],[50,11.9],[60,9.8],[70,7.8],[80,5.0],[90,2.9],[95,1.7],[98,0.9],[99.5,0.3]]};
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
@@ -682,8 +686,8 @@ function render() {
   } else { $('#updTse').innerHTML = 'Ensaio com dados reais de ' + (S.ensKey === '2t2022' ? '2022' : '2026'); $('#updNext').textContent = 'horário simulado'; }
   if (S.err && S.mode === 'live' && cur) $('#updTse').innerHTML += ` · <span class="dn">${esc(S.err)}</span>`;
   S.events = buildEvents();
-  S.proj = projCompute(cur);
-  renderHero(); renderProj(); renderEvo(); renderProg(); renderDiff(); renderSmalls(); renderExt(); renderStates(); renderLog();
+  S.proj = projCompute(cur); S.tr = trCompute(cur);
+  renderHero(); renderProj(); renderTr(); renderEvo(); renderProg(); renderDiff(); renderSmalls(); renderExt(); renderStates(); renderLog();
 }
 function candColor(k) { const c = S.cands.find(c => c.k === k); return c ? c.color : 'var(--co)'; }
 function renderHero() {
@@ -895,7 +899,7 @@ const PJ = { base: null, err: false, loading: false, prev: null };
 async function loadBase() {
   if (PJ.base || PJ.loading) return; PJ.loading = true;
   try { PJ.base = await getJSON('base-1t2026.json', 25000); } catch (e) { PJ.err = true; }
-  PJ.loading = false; if (S.cur) { S.proj = projCompute(S.cur); renderProj(); renderExt(); }
+  PJ.loading = false; PJ.ufTot = null; if (S.cur) { S.proj = projCompute(S.cur); S.tr = trCompute(S.cur); renderProj(); renderTr(); renderExt(); } else { renderTr(); }
 }
 function projCore(ufs, kappa) {
   let swN = 0, wN = 0, gV = 0, gB = 0;
@@ -1044,6 +1048,95 @@ function renderExt() {
   const bz = $('#btnZZ'); if (bz) bz.onclick = extCities;
 }
 function tc(s) { return String(s).toLowerCase().replace(/(^|[\s\-'(])([a-zà-ú])/g, (m, a, c) => a + c.toUpperCase()).replace(/\b(De|Da|Do|Das|Dos|E)\b/g, w => w.toLowerCase()); }
+
+// ---------- transferência da terceira via (saldo entre os turnos, estimativa) ----------
+// Para cada estado: votos de Flávio e Lula já apurados menos o 1º turno dos mesmos municípios (na fração já apurada
+// de cada um), dividido pelos votos que os outros candidatos tiveram nesses municípios no 1º turno.
+function trUF(u) { // [A, B, outros, cury, renan, caiado, zema] do 1º turno no estado
+  if (PJ.base && PJ.base.uf && PJ.base.uf[u]) {
+    PJ.ufTot = PJ.ufTot || {};
+    if (!PJ.ufTot[u]) { const t = [0, 0, 0, 0, 0, 0, 0]; for (const cd in PJ.base.uf[u]) { const v = PJ.base.uf[u][cd]; t[0] += v[0]; t[1] += v[1]; for (let i = 2; i < 7; i++) { t[2] += v[i] || 0; if (i < 6) t[i + 1] += v[i] || 0; } } PJ.ufTot[u] = t; }
+    return PJ.ufTot[u];
+  }
+  const r = R26.uf[u]; return r ? [r.c.F, r.c.L, r.c.o, 0, 0, 0, 0] : null;
+}
+function trTotals() {
+  if (S.mode === 'ensaio') { const t = [0, 0, 0]; for (const u in B22UF) for (let i = 0; i < 3; i++) t[i] += B22UF[u][i]; return { A1: t[0], B1: t[1], pool: t[2] }; }
+  const t = [0, 0, 0]; for (const u of UFS) { const v = trUF(u); if (v) for (let i = 0; i < 3; i++) t[i] += v[i]; } return { A1: t[0], B1: t[1], pool: t[2] };
+}
+function trBand(p, m) { const t = BAND_TR[m] || BAND_TR.uf; let v = t[0][1]; for (const [q, e] of t) if (p >= q) v = e; return v; }
+function trCompute(snap) {
+  if (!snap || !snap.br || !snap.br.ts) return null;
+  const ens = S.mode === 'ensaio'; if (ens && S.ensKey !== '2t2022') return null;
+  const pst = pct(snap.br.st, snap.br.ts), useMun = !ens && PJ.base && PJ.base.uf && S.abMun;
+  let dA = 0, dB = 0, P = 0, nMun = 0; const per = {};
+  for (const u of UFS) {
+    const x = snap.uf[u]; if (!x || !x.te) continue;
+    const c = Math.min(1, x.est / x.te), a = (x.c && x.c['22']) || 0, b = (x.c && x.c['13']) || 0;
+    let a1 = 0, b1 = 0, p1 = 0, how = 'uf';
+    const M = useMun ? S.abMun[u] : null, BM = useMun ? PJ.base.uf[u] : null;
+    if (M && BM) {
+      let est = 0, tt = 0; for (const cd in M) { est += M[cd][0]; tt += M[cd][1]; }
+      if (tt > 0 && Math.abs(est / tt - c) <= 0.03) {
+        for (const cd in BM) { const bm = BM[cd], m = M[cd], fr = m && m[1] > 0 ? Math.min(1, m[0] / m[1]) : 0; if (!fr) continue; a1 += fr * bm[0]; b1 += fr * bm[1]; for (let i = 2; i < 7; i++) p1 += fr * (bm[i] || 0); }
+        how = 'mun';
+      }
+    }
+    if (how === 'uf') { const bb = ens ? B22UF[u] : trUF(u); if (!bb) continue; a1 = c * bb[0]; b1 = c * bb[1]; p1 = c * bb[2]; } else nMun++;
+    dA += a - a1; dB += b - b1; P += p1;
+    per[u] = { c, tA: p1 > 0 ? 100 * (a - a1) / p1 : null, tB: p1 > 0 ? 100 * (b - b1) / p1 : null, P: p1, how };
+  }
+  if (!(P > 0) || !(pst >= 2)) return { pst, empty: true };
+  const method = nMun >= 20 ? 'mun' : 'uf';
+  return { pst, tA: 100 * dA / P, tB: 100 * dB / P, P, per, method, band: trBand(pst, method) };
+}
+function trRefs(e22) {
+  if (e22) return [['Resultado final de 2022', 72.1, 31.2]];
+  const Q = { cury: [33, 48], caiado: [57, 21], renan: [51, 25] }, T = trTotals();
+  let w = 0, f = 0, l = 0; const tot = [0, 0, 0, 0]; for (const u of UFS) { const v = trUF(u); if (v) { tot[0] += v[3]; tot[1] += v[4]; tot[2] += v[5]; } }
+  [['cury', tot[0]], ['renan', tot[1]], ['caiado', tot[2]]].forEach(([k, n]) => { w += n; f += n * Q[k][0]; l += n * Q[k][1]; });
+  const k = 100 * (T.A1 - T.B1) / T.pool;
+  return [['Pesquisa Quaest, 17 a 20/10 (o que disseram os eleitores de Cury, Caiado e Renan)', w ? f / w : 45.7, w ? l / w : 32.9],
+    ['Como foi em 2022 (Jair e Lula)', 72.1, 31.2], ['Como foi em 2018 (Jair e Haddad)', 32.2, 59.4],
+    ['Ponto de empate (com 20% sem votar validamente)', (80 - k) / 2, (80 + k) / 2]];
+}
+function renderTr() {
+  const el = $('#trCard'); if (!el) return;
+  const ens = S.mode === 'ensaio', e22 = ens && S.ensKey === '2t2022';
+  const [A, B] = S.cands.length ? S.cands : [candMeta('22', null, 2026), candMeta('13', null, 2026)];
+  const nA = e22 ? 'Jair' : A.short, nB = B.short;
+  const head = `<div class="phead"><h2>Transferência da terceira via <span class="ptag">estimativa</span></h2><span class="pmeta" id="trMeta"></span></div>`;
+  if (ens && !e22) { el.innerHTML = head + `<p class="lead">A transferência é medida no 2º turno. <a href="?ensaio=2t2022">Veja no ensaio de 2022</a> como esta conta se comportou.</p>`; return; }
+  const T = trTotals(), lead = T.A1 - T.B1, K = 100 * Math.abs(lead) / T.pool, lider = lead >= 0 ? nA : nB, desafiante = lead >= 0 ? nB : nA;
+  const R = S.tr, has = R && !R.empty;
+  const lead2 = `<p class="lead" style="margin-bottom:8px">Dos ${fmtBig(T.pool)} de votos que ${e22 ? 'os outros candidatos tiveram no 1º turno de 2022' : 'Cury, Renan, Caiado, Zema e os outros seis tiveram no 1º turno'}, quanto ${esc(nA)} e ${esc(nB)} ganharam no 2º turno, nos municípios já apurados. É um saldo: inclui quem passou a votar ou deixou de votar e quem trocou de lado.</p>`;
+  const thr = `<div class="pens pmsg" style="margin:8px 0">Para ${esc(desafiante)} virar, o ganho dele precisa superar o de ${esc(lider)} em <b>${dec(K, 1)} pontos</b> (${e22 ? 'Lula' : 'Flávio'} terminou o 1º turno ${fmtBig(Math.abs(lead))} de votos à frente).${has ? ` Até agora: ${esc(desafiante)} ${(lead >= 0 ? R.tB - R.tA : R.tA - R.tB) >= 0 ? '+' : '−'}${dec(Math.abs(lead >= 0 ? R.tB - R.tA : R.tA - R.tB), 1)} ponto${Math.abs(lead >= 0 ? R.tB - R.tA : R.tA - R.tB) >= 2 ? 's' : ''} em relação a ${esc(lider)}.` : ''}</div>`;
+  const refs = trRefs(e22);
+  let near = '';
+  if (has && !e22) { const d = refs.map(r => [r[0], Math.hypot(r[1] - R.tA, r[2] - R.tB)]).sort((p, q) => p[1] - q[1])[0]; near = `<p class="lead" style="margin:6px 0 0">Até agora, o mais parecido é: <b>${esc(d[0].split(' (')[0])}</b>.</p>`; }
+  const restTxt = n => n >= -0.5 ? fmtP(Math.max(0, n), 0) : `${fmtP(-n, 0)} de votos novos`;
+  const rowT = (lab, a, b, strong) => `<tr${strong ? ' style="font-weight:700"' : ''}><td>${lab}</td><td class="r" style="color:${A.color}">${fmtP(a, 0)}</td><td class="r" style="color:${B.color}">${fmtP(b, 0)}</td><td class="r hm2" style="color:var(--mut)">${restTxt(100 - a - b)}</td></tr>`;
+  const refTbl = `<div class="tblWrap" style="margin-top:8px"><table class="t"><thead><tr><th>Para onde foram os votos dos outros candidatos</th><th class="r">${esc(nA)}</th><th class="r">${esc(nB)}</th><th class="r hm2">Nenhum dos dois</th></tr></thead><tbody>${has ? rowT('Até agora (estimativa)', R.tA, R.tB, true) : ''}${refs.map(r => rowT(r[0], r[1], r[2])).join('')}</tbody></table></div>${near}`;
+  const how = `<details><summary>Como é calculado e quanto erra</summary><p>Em cada estado, o laboratório compara os votos de ${esc(nA)} e ${esc(nB)} já apurados com o 1º turno dos mesmos municípios, na proporção já apurada de cada um, e divide o ganho de cada um pelos votos que os outros candidatos tiveram ali no 1º turno. Como é um saldo, ele também capta quem foi votar só no 2º turno, quem deixou de votar e quem trocou de lado.<br>Refizemos a conta com a apuração do 2º turno de 2022: no meio da apuração ela errou até 11 pontos, sempre exagerando o ganho de Jair e diminuindo o de Lula (as primeiras urnas de cada cidade puxavam para Jair); com 80% apurado, o erro caiu para 2 pontos e, com 98%, para 0,3. No fim da apuração a conta é exata: em 2022, Jair ganhou o equivalente a 72% dos votos dos outros candidatos e Lula, 31%.${ens ? ' No ensaio, a conta usa só os totais de cada estado, por isso erra mais.' : ''}</p></details>`;
+  if (!has) {
+    el.innerHTML = head + lead2 + `<p class="pmsg">Os números aparecem com 2% das urnas apuradas${R && R.pst != null ? ` (agora: ${fmtP(R.pst, 2)})` : ''}. Até lá, as referências:</p>` + refTbl + thr + how; return;
+  }
+  const rest = 100 - R.tA - R.tB, wsum = Math.max(100, R.tA + R.tB);
+  let ufRows = '';
+  if (!e22) {
+    const nm = ['Cury', 'Renan', 'Caiado', 'Zema'];
+    const list = UFS.map(u => ({ u, v: trUF(u) })).filter(o => o.v && o.v[2] > 0).sort((p, q) => q.v[2] - p.v[2]).slice(0, 10);
+    ufRows = `<div class="tblWrap" style="margin-top:10px"><table class="t"><thead><tr><th>Estado</th><th class="r hm2">Outros candidatos no 1º turno</th><th class="r">Apurado</th><th class="r">${esc(nA)}</th><th class="r">${esc(nB)}</th></tr></thead><tbody>${list.map(o => { const p = R.per[o.u], v = o.v, top = [3, 4, 5, 6].map(i => [i, v[i]]).sort((x, y) => y[1] - x[1])[0], sh = v[2] ? 100 * top[1] / v[2] : 0, ok = p && p.c >= 0.2 && p.P >= 20000 && p.tA != null; return `<tr><td>${UFN[o.u]}</td><td class="r hm2" style="color:var(--mut)">${fmtShort(v[2])} · ${nm[top[0] - 3]} ${dec(sh, 0)}%</td><td class="r">${p ? fmtP(100 * p.c, 0) : '—'}</td><td class="r" style="color:${A.color}">${ok ? fmtP(p.tA, 0) : '—'}</td><td class="r" style="color:${B.color}">${ok ? fmtP(p.tB, 0) : '—'}</td></tr>`; }).join('')}</tbody></table></div><p class="lead" style="margin:6px 0 0">Os 10 estados com mais votos nos outros candidatos. Os números aparecem quando o estado passa de 20% apurado.${(() => { const g = trUF('go'); return g && g[2] ? ` Em Goiás, onde Caiado teve ${dec(100 * g[5] / g[2], 0)}% desses votos, a conta mostra sobretudo o caminho dos eleitores dele.` : ''; })()}</p>`;
+  }
+  let real = '';
+  if (e22) { const e1 = R.tA - 72.1, e2 = R.tB - 31.2; real = `<p class="pmsg pens">Resultado final de 2022: Jair ganhou o equivalente a 72,1% e Lula 31,2%. <b>Erro desta conta agora: ${dec(Math.abs(e1), 1)} ponto${Math.abs(e1) >= 2 ? 's' : ''} para Jair e ${dec(Math.abs(e2), 1)} para Lula.</b></p>`; }
+  el.innerHTML = head + lead2 + `<div class="pnums">
+      <div class="pnum"><div class="n">${esc(nA)} ganhou o equivalente a</div><div class="v" style="color:${A.color}">${fmtP(R.tA, 0)}</div><div class="s">dos votos dos outros candidatos</div></div>
+      <div class="pnum"><div class="n">${esc(nB)} ganhou o equivalente a</div><div class="v" style="color:${B.color}">${fmtP(R.tB, 0)}</div><div class="s">${rest >= 0 ? `nenhum dos dois: ${fmtP(rest, 0)}` : `${fmtP(-rest, 0)} vêm de votos válidos novos`}</div></div></div>
+    <div class="trbar"><div style="width:${(100 * Math.max(0, R.tA) / wsum).toFixed(2)}%;background:${A.color}"></div><div style="width:${(100 * Math.max(0, R.tB) / wsum).toFixed(2)}%;background:${B.color}"></div>${rest > 0 ? `<div style="width:${(100 * rest / wsum).toFixed(2)}%;background:var(--line2)"></div>` : ''}</div>
+    <p class="lead" style="margin:4px 0 0">${R.pst >= 100 ? 'Apuração concluída: este é o saldo final.' : `Com ${fmtP(R.pst, 1)} apurado. Em 2022, nesta fase da apuração, esta conta errou até ${dec(R.band, 1)} pontos.`}</p>` + real + thr + refTbl + ufRows + how;
+  const m = $('#trMeta'); if (m) m.textContent = R.pst >= 100 ? '' : `± ${dec(R.band, 0)} pontos · ${R.method === 'mun' ? 'por município' : 'por estado'}`;
+}
 
 // ---------- controles ----------
 $('#btnRefresh').onclick = () => { if (S.mode === 'ensaio') { toast('No ensaio, os dados avançam sozinhos'); return; } refresh(true); };
